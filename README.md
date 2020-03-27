@@ -1,4 +1,4 @@
-# corona-game
+# Coro-Nation
 
 ## Project setup
 ```
