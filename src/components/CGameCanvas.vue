@@ -3,7 +3,7 @@
     <v-row class="text-center">
       <v-col>
         <div>
-          <canvas id="canvas" width="800" height="600">
+          <canvas id="canvas" width="500" height="400">
             Sorry, browser does not support canvas.
           </canvas>
         </div>
