@@ -1,19 +1,23 @@
 <template>
   <div class="home">
     <!--<img alt="Vue logo" src="../assets/logo.png">-->
-  <main-layout/>
-    <!--<c-game-canvas msg="Welcome to Your Vue.js App"/>-->
+  <main-layout>
+    <template v-slot:canvas>
+      <c-game-canvas msg="Welcome to Your Vue.js App"/>
+    </template>
+  </main-layout>
+
   </div>
 </template>
 
 <script>
   import {MainLayout} from '../layouts'
 // @ is an alias to /src
-// import CGameCanvas from '@/components/CGameCanvas.vue'
+import CGameCanvas from '@/components/CGameCanvas.vue'
 export default {
   name: 'Home',
   components: {
-    // CGameCanvas
+    CGameCanvas,
     MainLayout
   },
   data() {

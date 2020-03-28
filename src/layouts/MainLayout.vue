@@ -71,7 +71,7 @@
                 <v-flex xs6>
                     <div  class="pb-2">
                         <v-card color="yellow" height="500" width="100%">
-
+                            <slot name="canvas"/>
                         </v-card>
                     </div>
                     <div>
