@@ -16,6 +16,13 @@
           id="bar"
           style="display:none"
         />
+        <div>
+          {{counts}}
+        </div>
+        <div>
+          Ticks today: {{ticksPassed}}<br/>
+          Days passed: {{daysPassed}}
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -25,7 +32,26 @@
 import Person from './Person';
 import Point from './Point';
 
-const person1 = new Person(new Point(400, 30), new Point(1, 2));
+let healthyPeople = [];
+let immunePeople = [];
+let deadPeople = [];
+const radius = 5;
+let sickPeople = [new Person(new Point(400, 300), new Point(1, 2), radius)];
+const ticksPerDay = 100;
+for (let i = 0; i < 1000; i++) {
+  const posX = Math.floor(Math.random() * (800 - 2 * radius)) + radius;
+  const posY = Math.floor(Math.random() * (600 - 2 * radius)) + radius;
+  let movX = Math.floor(Math.random() * 7) - 3;
+  if (movX === 0) {
+    movX -= 1;
+  }
+  let movY = Math.floor(Math.random() * 7) - 3;
+  if (movY === 0) {
+    movY -= 1;
+  }
+
+  healthyPeople.push(new Person(new Point(posX, posY), new Point(movX, movY), radius));
+}
 
 export default {
   name: 'GameCanvas',
@@ -39,6 +65,15 @@ export default {
     dxBar: 6,
     timer: null,
     barImg: null,
+    counts: {
+      healthy: 0,
+      sick: 0,
+      immune: 0,
+      dead: 0,
+      total: 0,
+    },
+    ticksPassed: 0,
+    daysPassed: 0,
   }),
   created() {
     var vm = this;
@@ -80,17 +115,87 @@ export default {
       }
     },
     tick() {
-      console.log(this.canvas.width, this.canvas.height)
-      person1.tick({minX: 0, minY: 0, maxX: this.canvas.width, maxY: this.canvas.height});
+      this.movePeople();
+      this.checkRecoveryDeath();
+      this.spreadVirus();
+      this.updateCounts();
+
+      this.ticksPassed += 1;
+      if (this.ticksPassed % ticksPerDay === 0) {
+        this.ticksPassed = 0;
+        this.daysPassed += 1;
+      }
+    },
+    movePeople() {
+      const boundary = {minX: 0, minY: 0, maxX: this.canvas.width, maxY: this.canvas.height};
+      healthyPeople.forEach(person => person.tick(boundary, ticksPerDay));
+      sickPeople.forEach(person => person.tick(boundary, ticksPerDay));
+      immunePeople.forEach(person => person.tick(boundary, ticksPerDay));
+    },
+    checkRecoveryDeath() {
+      sickPeople.forEach(person => person.checkRecoverOrDeath(ticksPerDay));
+      immunePeople.push(...sickPeople.filter(x => x.immune));
+      deadPeople.push(...sickPeople.filter(x => !x.alive));
+      sickPeople = sickPeople.filter(x => !x.immune && x.alive);
+    },
+    spreadVirus() {
+      const spreadChance = 0.1;
+      const r2 = radius * radius;
+      healthyPeople.forEach(
+        person => {
+          let staysHealthy = true;
+          for (let i = 0; i < sickPeople.length; i++) {
+            if (this.distance2(person, sickPeople[i]) <= r2) {
+              const rand = Math.random();
+              if (rand < spreadChance) {
+                staysHealthy = false;
+                break;
+              }
+            }
+          }
+          if (!staysHealthy) {
+            person.healthy = false;
+          }
+        },
+      );
+      sickPeople.push(...(healthyPeople.filter(x => !x.healthy)));
+      healthyPeople = healthyPeople.filter(x => x.healthy);
+    },
+    updateCounts() {
+      this.counts.healthy = healthyPeople.length;
+      this.counts.sick = sickPeople.length;
+      this.counts.immune = immunePeople.length;
+      this.counts.dead = deadPeople.length;
+      this.counts.total = [immunePeople, sickPeople, healthyPeople, deadPeople].reduce((acc, cur) => acc + cur.length, 0);
+    },
+    distance2(person1, person2) {
+      return Math.pow(person1.pos.x - person2.pos.x, 2) + Math.pow(person1.pos.y - person2.pos.y, 2);
     },
     draw() {
       this.tick();
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.fillStyle = '#FF00FF';
+      this.ctx.fillStyle = '#AAAAFF';
       // this.ctx.fillStyle = '#FAF7F8';
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.fillStyle = '#003300';
-      this.drawBall(person1.getCircle());
+
+      this.ctx.fillStyle = '#000000';
+      healthyPeople.forEach(person => {
+        this.drawBall(person.getCircle());
+      });
+
+      this.ctx.fillStyle = '#FF0000';
+      sickPeople.forEach(
+        person => {
+          this.drawBall(person.getCircle());
+        },
+      );
+
+      this.ctx.fillStyle = '#00FF00';
+      immunePeople.forEach(
+        person => {
+          this.drawBall(person.getCircle());
+        },
+      );
       // if (this.circle.x + this.dx > this.canvas.width || this.circle.x + this.dx < 0)
       //   this.dx = -this.dx;
       // if (this.circle.y + this.dy > this.bar.y && this.circle.x > this.bar.x && this.circle.x < this.bar.x + this.barImg.width)
