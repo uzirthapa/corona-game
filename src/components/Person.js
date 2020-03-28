@@ -32,6 +32,17 @@ export default class Person {
     return {...this.pos.toObj(), r: this.radius};
   }
 
+  updatePos(maxX, maxY){
+    this.pos = this.pos.add(this.moveVector);
+    if ((this.pos.x - this.radius < 0) || (this.pos.x + this.radius > maxX)){
+      this.moveVector.x *= -1;
+    }
+
+    if ((this.pos.y - this.radius < 0) || (this.pos.y + this.radius > maxY)){
+      this.moveVector.y *= -1;
+    }
+  }
+
   tick({minX, minY, maxX, maxY}, ticksPerDay) {
     let newX = this.pos.x + this.moveVector.x;
     let newY = this.pos.y + this.moveVector.y;

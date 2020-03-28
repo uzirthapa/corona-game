@@ -10,4 +10,14 @@ export default class Point {
       y: this.y,
     };
   }
+
+  add(otherPoint) {
+    return new Point(this.x + otherPoint.x, this.y + otherPoint.y);
+  }
+
+  floor() {
+    return new Point(Math.floor(this.x), Math.floor(this.y));
+  }
 }
+
+export const Zero = new Point(0, 0);

@@ -23,6 +23,16 @@
           Ticks today: {{ticksPassed}}<br/>
           Days passed: {{daysPassed}}
         </div>
+
+        <div>
+          <canvas
+            id="canvas2"
+            width="800"
+            height="600"
+          >
+            Sorry, browser does not support canvas
+          </canvas>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -31,14 +41,18 @@
 <script>
 import Person from './Person';
 import Point from './Point';
+import Quad from './Quad';
+import Region from './Region';
 
 let healthyPeople = [];
 let immunePeople = [];
 let deadPeople = [];
 const radius = 5;
-let sickPeople = [new Person(new Point(400, 300), new Point(1, 2), radius)];
+const patientX = new Person(new Point(400, 300), new Point(1, 2), radius);
+patientX.healthy = false;
+let sickPeople = [patientX];
 const ticksPerDay = 100;
-for (let i = 0; i < 1000; i++) {
+for (let i = 0; i < 10; i++) {
   const posX = Math.floor(Math.random() * (800 - 2 * radius)) + radius;
   const posY = Math.floor(Math.random() * (600 - 2 * radius)) + radius;
   let movX = Math.floor(Math.random() * 7) - 3;
@@ -53,10 +67,14 @@ for (let i = 0; i < 1000; i++) {
   healthyPeople.push(new Person(new Point(posX, posY), new Point(movX, movY), radius));
 }
 
+const testRegion = new Region(new Quad(0, 0, 400, 300));
+const testViewPort = new Quad(0, 0, 800, 600);
+
 export default {
   name: 'GameCanvas',
   data: () => ({
     canvas: null,
+    canvas2: null,
     ctx: null,
     dx: 1,
     dy: 2,
@@ -81,9 +99,15 @@ export default {
       window.addEventListener('keydown', vm.doKeyDown, false);
       vm.barImg = document.getElementById('bar');
       vm.canvas = document.getElementById('canvas');
-      console.log(vm.canvas);
+      vm.canvas2 = document.getElementById('canvas2');
       vm.ctx = vm.canvas.getContext('2d');
-      vm.timer = setInterval(vm.draw, 10);
+      vm.timer = setInterval(
+        () => {
+          vm.draw();
+          vm.draw2();
+        },
+        10,
+      );
       vm.bar = new vm.Bar(400, 500);
       // vm.circle = new vm.Circle(400, 30, 10);
     });
@@ -171,6 +195,14 @@ export default {
     distance2(person1, person2) {
       return Math.pow(person1.pos.x - person2.pos.x, 2) + Math.pow(person1.pos.y - person2.pos.y, 2);
     },
+    draw2() {
+      testRegion.tick();
+      this.canvas2.getContext('2d').clearRect(0, 0, this.canvas2.width, this.canvas2.height);
+      testRegion.draw(this.canvas2, testViewPort, 0.5);
+      testRegion.draw(this.canvas2, new Quad(testViewPort.x - 400, testViewPort.y - 300, 800, 600), 1);
+      testRegion.draw(this.canvas2, new Quad(testViewPort.x, testViewPort.y - 300, 800, 600), 1);
+      testRegion.draw(this.canvas2, new Quad(testViewPort.x - 400, testViewPort.y, 800, 600), 1);
+    },
     draw() {
       this.tick();
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -196,6 +228,11 @@ export default {
           this.drawBall(person.getCircle());
         },
       );
+
+      // if (this.counts.sick === 0) {
+      //   console.log('THE END');
+      //   clearInterval(this.timer);
+      // }
       // if (this.circle.x + this.dx > this.canvas.width || this.circle.x + this.dx < 0)
       //   this.dx = -this.dx;
       // if (this.circle.y + this.dy > this.bar.y && this.circle.x > this.bar.x && this.circle.x < this.bar.x + this.barImg.width)
