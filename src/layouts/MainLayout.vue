@@ -474,7 +474,7 @@ export default {
         {
           title: 'Lock down',
           tag: 'lockDown',
-          factor: 0.05,
+          factor: 0,
           icon: 'XX',
           used: false,
           description: 'This will decrease movement to 0 for all except 5% of population for 5 days',
@@ -575,7 +575,7 @@ export default {
         case 'stayHome':
           this.updateStayAtHomeFactor(power.factor);
           break;
-        case 'lockdown':
+        case 'lockDown':
           this.updateLockDownFactor(power.factor);
           break;
         default:

@@ -15,11 +15,11 @@
           Sorry, browser does not support canvas.
         </canvas>
       </v-col>
-            <v-col>
-              <div>
-                {{configs}}
-              </div>
-            </v-col>
+      <v-col>
+        <div>
+          {{configs}}
+        </div>
+      </v-col>
     </v-row>
     <v-row justify="center">
       <v-col class="d-flex justify-center">
@@ -51,7 +51,7 @@
 import Quad from './Quad';
 import Region from './Region';
 
-import {mapMutations, mapGetters} from 'vuex';
+import {mapState, mapMutations, mapGetters} from 'vuex';
 
 export default {
   name: 'GameCanvas',
@@ -102,8 +102,18 @@ export default {
     // return this.timer;
   },
   computed: {
+    ...mapState({
+      lockDownDay: state => state.lockDownDay,
+      daysActive: state => state.days,
+    }),
     ...mapGetters({
       washHandsFactor: 'washHandsFactor',
+      cdcSpeechFactor: 'cdcSpeechFactor',
+      newHospitalFactor: 'newHospitalFactor',
+      vaccinePercentage: 'vaccinePercentage',
+      socialDistancingFactor: 'socialDistancingFactor',
+      stayAtHomeFactor: 'stayAtHomeFactor',
+      lockDownFactor: 'lockDownFactor',
     }),
     configs() {
       return {
@@ -115,12 +125,11 @@ export default {
         spreadChance: 0.1, // chances need to be between 0-1 (inclusive),
 
         washHandsFactor: this.washHandsFactor, // Wash Hands getter
-        cdcSpeechFactor: 1, // Speech by CDC getter
-        newHospitalFactor: 1, // Open new hospital getter
-        socialDistancingFactor: 1, // Social Distancing getter
-        stayAtHomeFactor: 1, // Stay at home order getter
-        lockDownFactor: 1, // Lock down order getter
-        vaccinePercentage: 0, // This should be set to the percentage (in decimal form) of Healthy people to make immune
+        cdcSpeechFactor: this.cdcSpeechFactor, // Speech by CDC getter
+        newHospitalFactor: this.newHospitalFactor, // Open new hospital getter
+        socialDistancingFactor: this.socialDistancingFactor, // Social Distancing getter
+        stayAtHomeFactor: this.stayAtHomeFactor, // Stay at home order getter
+        lockDownFactor: this.lockDownFactor, // Lock down order getter
         // note that the "Vaccine notice" will need a method that is called via a Watcher when that button is pressed
         // since this is a "one and done" effect instead of a continuous effect
       };
@@ -142,6 +151,7 @@ export default {
     ...mapMutations([
       'updateCounts',
       'updateDays',
+      'updateLockDownFactor',
     ]),
     playPause() {
       this.paused = !this.paused;
@@ -196,8 +206,16 @@ export default {
       if (this.ticksPassed % this.configs.ticksPerDay === 0) {
         this.ticksPassed = 0;
         this.daysPassed += 1;
+        this.onDayEnd();
       }
+    },
+    onDayEnd() {
       this.updateDays(this.daysPassed);
+
+      console.log(this.lockDownDay, this.daysActive);
+      if (this.lockDownFactor !== 1 && (this.lockDownDay + 5 < this.daysActive)) {
+        this.updateLockDownFactor(1);
+      }
     },
     updateAllCounts() {
       this.regions.forEach(region => {
@@ -230,6 +248,13 @@ export default {
     },
     vaccinate(percentage) {
       this.regions.forEach(region => region.vaccinate(percentage));
+    },
+  },
+  watch: {
+    vaccinePercentage(newVal, oldVal) {
+      if (oldVal === 0 && newVal > 0) {
+        this.vaccinate(newVal);
+      }
     },
   },
 };
