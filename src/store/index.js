@@ -16,7 +16,7 @@ export default new Vuex.Store({
 
     counts: {},
     radius: 0,
-    days: null,
+    days: 0,
     // moveSpeed: 2,
     // minDaysSick: 14,
     // recoveryRate: 0.2, // rates need to be between 0-1 (inclusive)

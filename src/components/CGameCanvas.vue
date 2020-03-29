@@ -2,7 +2,7 @@
   <v-container
     fluid
     class="pa-0"
-    style="width: 100%; height: 100%; overflow-y: auto;"
+    style="width: 100%; height: 100%;"
   >
     <v-row class="text-center px-2">
       <v-col>
@@ -15,11 +15,11 @@
           Sorry, browser does not support canvas.
         </canvas>
       </v-col>
-      <v-col>
-        <div>
-          {{configs}}
-        </div>
-      </v-col>
+<!--      <v-col>-->
+<!--        <div>-->
+<!--          {{configs}}-->
+<!--        </div>-->
+<!--      </v-col>-->
     </v-row>
     <v-row justify="center">
       <v-col class="d-flex justify-center">
@@ -79,27 +79,8 @@ export default {
       () => {
         vm.canvas = vm.$refs.canvas;
         vm.drawBackground();
-        console.log('Canvas', vm.canvas);
-        // vm.timer = setInterval(
-        //   () => {
-        //     vm.draw();
-        //   },
-        //   10,
-        // );
       },
     );
-    // var vm = this;
-    // this.$nextTick(() => {
-    //   vm.canvas = document.getElementById('canvas');
-    //   vm.timer = setInterval(
-    //     () => {
-    //       vm.draw();
-    //     },
-    //     10,
-    //   );
-    // });
-    //
-    // return this.timer;
   },
   computed: {
     ...mapState({
@@ -212,7 +193,6 @@ export default {
     onDayEnd() {
       this.updateDays(this.daysPassed);
 
-      console.log(this.lockDownDay, this.daysActive);
       if (this.lockDownFactor !== 1 && (this.lockDownDay + 5 < this.daysActive)) {
         this.updateLockDownFactor(1);
       }
