@@ -2,92 +2,118 @@
   <v-container>
     <v-row class="text-center">
       <v-col>
+        <canvas
+          id="canvas"
+          width="500"
+          height="400"
+        >
+          Sorry, browser does not support canvas.
+        </canvas>
+      </v-col>
+      <v-col>
         <div>
-          <canvas id="canvas" width="800" height="600">
-            Sorry, browser does not support canvas.
-          </canvas>
+          {{counts}}
         </div>
-        <img src="../assets/bar.png" id="bar" style="display:none"/>
+        <div>
+          Total sick: {{totalSick}}
+        </div>
+        <div>
+          Ticks today: {{ticksPassed}}<br/>
+          Days passed: {{daysPassed}}
+        </div>
+        <div v-if="totalExisting > 0">
+          Alive%: {{totalAlive * 100 / totalExisting}}<br/>
+          Sick%: {{totalSick * 100 / totalExisting}}<br/>
+          Dead%: {{totalDead * 100 / totalExisting}}
+        </div>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-  export default {
-    name: 'GameCanvas',
-    data: () => ({
-      canvas: null,
-      ctx: null,
-      dx: 1,
-      dy: 2,
-      bar: null,
-      circle: null,
-      dxBar: 6,
-      timer: null,
-      barImg: null
-    }),
-    created() {
-      var vm = this
-      this.$nextTick(() => {
-        window.addEventListener("keydown",vm.doKeyDown,false);
-        vm.barImg=document.getElementById("bar");
-        vm.canvas = document.getElementById("canvas");
-        console.log(vm.canvas)
-        vm.ctx = vm.canvas.getContext("2d");
-        vm.timer=setInterval(vm.draw, 10);
-        vm.bar = new vm.Bar(400,500)
-        vm.circle = new vm.Circle(400,30,10)
-      })
+import Quad from './Quad';
+import Region from './Region';
 
-      return this.timer;
+const testRegion = new Region('Test Region', new Quad(0, 0, 500, 400));
+testRegion.initialize(500);
+const testViewPort = new Quad(0, 0, 500, 400);
+
+export default {
+  name: 'GameCanvas',
+  data: () => ({
+    canvas: null,
+    timer: null,
+    counts: {},
+    ticksPassed: 0,
+    daysPassed: 0,
+  }),
+  created() {
+    var vm = this;
+    this.$nextTick(() => {
+      vm.canvas = document.getElementById('canvas');
+      vm.timer = setInterval(
+        () => {
+          vm.draw();
+        },
+        10,
+      );
+    });
+
+    return this.timer;
+  },
+  computed: {
+    configs() {
+      return {
+        ticksPerDay: 100,
+        moveSpeed: 2,
+        minDaysSick: 14,
+        recoveryRate: 0.2, // rates need to be between 0-1 (inclusive)
+        deathRate: 0.05, // rates need to be between 0-1 (inclusive)
+        spreadChance: 0.1, // chances need to be between 0-1 (inclusive)
+      };
     },
-    methods: {
-      Bar(x,y){
-        this.x=x;
-        this.y=y;
-      },
-      Circle(x,y,r){
-        this.x=x;
-        this.y=y;
-        this.r=r;
-      },
-      drawBall(c) {
-        this.ctx.beginPath();
-        this.ctx.arc(c.x, c.y, c.r, 0, Math.PI*2, true);
-        this.ctx.fill();
-      },
-      doKeyDown(e){
-        if(e.keyCode==37){
-          if(this.bar.x-this.dxBar>0)
-            this.bar.x-=this.dxBar;
-        }
-        else if(e.keyCode==39){
-          if(this.bar.x+this.dxBar<this.canvas.width)
-            this.bar.x+=this.dxBar;
-        }
-      },
-      draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "#FAF7F8";
-        this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
-        this.ctx.fillStyle = "#003300";
-        this.drawBall(this.circle);
-        if (this.circle.x +this.dx > this.canvas.width || this.circle.x +this.dx < 0)
-          this.dx=-this.dx;
-        if(this.circle.y+this.dy>this.bar.y && this.circle.x>this.bar.x && this.circle.x<this.bar.x+this.barImg.width)
-          this.dy=-this.dy;
-        if (this.circle.y +this.dy > this.canvas.height || this.circle.y +this.dy < 0)
-          this.dy=-this.dy;
-        this.circle.x += this.dx;
-        this.circle.y += this.dy;
-        this.ctx.drawImage(this.barImg,this.bar.x,this.bar.y);
-        if(this.circle.y>this.bar.y){
-          clearTimeout(this.timer);
-          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-          alert("Game Over");
-        }
+    totalSick() {
+      return Object.values(this.counts).reduce((total, {Sick}) => total += Sick, 0);
+    },
+    totalAlive() {
+      return Object.values(this.counts).reduce((total, {totalAlive}) => total += totalAlive, 0);
+    },
+    totalDead() {
+      return Object.values(this.counts).reduce((total, {Dead}) => total += Dead, 0);
+    },
+    totalExisting() {
+      return this.totalAlive + this.totalDead;
+    },
+  },
+  methods: {
+    tick() {
+      // pretick all regions
+      testRegion.preTick(this.configs);
+
+      // then tick all regions
+      testRegion.tick(this.configs);
+
+      // update counts
+      this.$set(this.counts, testRegion.name, testRegion.getCounts());
+
+      this.ticksPassed += 1;
+      if (this.ticksPassed % this.configs.ticksPerDay === 0) {
+        this.ticksPassed = 0;
+        this.daysPassed += 1;
       }
-    }
-  }
+    },
+    draw() {
+      this.tick();
+      this.canvas.getContext('2d').clearRect(0, 0, this.canvas.width, this.canvas.height);
+      testRegion.draw(this.canvas, testViewPort, 1);
+      this.checkEnd();
+    },
+    checkEnd() {
+      if (this.totalSick === 0) {
+        clearInterval(this.timer);
+      }
+    },
+  },
+};
 </script>
