@@ -1,110 +1,67 @@
 <template>
-  <div class="home">
-    <!--<img alt="Vue logo" src="../assets/logo.png">-->
-  <main-layout>
-    <template v-slot:canvas>
-      <c-game-canvas msg="Welcome to Your Vue.js App"/>
-    </template>
-  </main-layout>
+  <v-container fluid>
+    <v-row>
+      <v-col cols="12">
+        <v-row align="center" justify="center">
+          <span class="accent--text display-4">
+            CoroNation
+          </span>
+        </v-row>
+        <v-row align="center" justify="center">
+          <span class="secondary--text display-1">
+            Decide or Die
+          </span>
+        </v-row>
+      </v-col>
+    </v-row>
+    <v-row justify="center" align="center">
+      <v-col xs="12" sm="10" md="6" lg="4">
+        <v-row>
+          <v-col cols="12">
+            <v-card
+                    to="game"
+                    outlined
+                    height="200px"
+                    img="../assets/corona-spread.jpg"
+                    :hover="true"
+            >
+              <v-img src="../assets/corona-spread.jpg" height="100%" class="text-secondary align-end">
+                <v-card-text class="display-1">Play</v-card-text>
+              </v-img>
 
-  </div>
+            </v-card>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="6">
+            <v-card
+                    class="pa-3 headline"
+                    outlined
+                    height="200px"
+            >
+              Game Settings
+            </v-card>
+          </v-col>
+
+          <v-col cols="6">
+            <v-card
+                    to="about"
+                    class="pa-3 headline"
+                    outlined
+                    height="200px"
+            >About Us</v-card>
+
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
-  import {MainLayout} from '../layouts'
-// @ is an alias to /src
-import CGameCanvas from '@/components/CGameCanvas.vue'
 export default {
   name: 'Home',
   components: {
-    CGameCanvas,
-    MainLayout
   },
-  data() {
-    return {
-      value: [0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8,],
-      dayNum: 6,
-      menu: false,
-      confirmedCases: [
-        {
-          name: "USA",
-          cases: 500
-        },
-        {
-          name: "China",
-          cases: 500
-        },
-        {
-          name: "Italy",
-          cases: 500
-        },
-        {
-          name: "India",
-          cases: 500
-        },
-        {
-          name: "Nepal",
-          cases: 500
-        },
-        {
-          name: "Spain",
-          cases: 500
-        }
-      ],
-      cdcPowers: [
-        {
-          title: "Wash your hands #tweet",
-          icon: "XX",
-          description: "This will limit the spread of germs by 1/2 because people will be washing them away"
-        },
-        {
-          title: "Speech by Dr.Fauchi",
-          icon: "XX",
-          description: "This will limit the spread of germs by 1/2 because people will be washing them away"
-        },
-        {
-          title: "News Report on vaccine",
-          icon: "XX",
-          description: "This will limit the spread of germs by 1/2 because people will be washing them away"
-        },
-        {
-          title: "Wash your hands #tweet",
-          icon: "XX",
-          description: "This will limit the spread of germs by 1/2 because people will be washing them away"
-        },
-
-      ],
-      govtPowers : [
-        {
-          title: "Stay at home order",
-          icon: "XX",
-          description: "This will limit the spread of germs by 1/2 because people will be washing them away"
-        },
-        {
-          title: "Social Distancing",
-          icon: "XX",
-          description: "This will limit the spread of germs by 1/2 because people will be washing them away"
-        },
-        {
-          title: "Lockdown Country",
-          icon: "XX",
-          description: "This will limit the spread of germs by 1/2 because people will be washing them away"
-        },
-        {
-          title: "Nuclear Bomb",
-          icon: "XX",
-          description: "This will limit the spread of germs by 1/2 because people will be washing them away"
-        },
-      ]
-    }
-  },
-  methods: {
-    runGovtPower(power){
-      console.log(power)
-    },
-    runCdcPower(power) {
-      console.log(power)
-    }
-  }
 }
 </script>
