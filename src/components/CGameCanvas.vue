@@ -67,7 +67,8 @@ for (let i = 0; i < 10; i++) {
   healthyPeople.push(new Person(new Point(posX, posY), new Point(movX, movY), radius));
 }
 
-const testRegion = new Region(new Quad(0, 0, 400, 300));
+const testRegion = new Region(new Quad(0, 0, 800, 600));
+testRegion.initialize(100);
 const testViewPort = new Quad(0, 0, 800, 600);
 
 export default {
@@ -196,12 +197,24 @@ export default {
       return Math.pow(person1.pos.x - person2.pos.x, 2) + Math.pow(person1.pos.y - person2.pos.y, 2);
     },
     draw2() {
-      testRegion.tick();
+      const configs = {
+        moveSpeed: 2.5,
+        minDaysSick: 14,
+        recoveryRate: 0.2,
+        deathRate: 0.05,
+        ticksPerDay: ticksPerDay,
+      };
+      // pretick all regions
+      testRegion.preTick(configs);
+      // tick all regions
+      testRegion.tick(configs);
       this.canvas2.getContext('2d').clearRect(0, 0, this.canvas2.width, this.canvas2.height);
-      testRegion.draw(this.canvas2, testViewPort, 0.5);
-      testRegion.draw(this.canvas2, new Quad(testViewPort.x - 400, testViewPort.y - 300, 800, 600), 1);
-      testRegion.draw(this.canvas2, new Quad(testViewPort.x, testViewPort.y - 300, 800, 600), 1);
-      testRegion.draw(this.canvas2, new Quad(testViewPort.x - 400, testViewPort.y, 800, 600), 1);
+      this.canvas2.getContext('2d').fillStyle = '#FF00FF';
+      this.canvas2.getContext('2d').fillRect(0, 0, 800, 600);
+      testRegion.draw(this.canvas2, testViewPort, 1);
+      // testRegion.draw(this.canvas2, new Quad(0, 300, 800, 600), 1);
+      // testRegion.draw(this.canvas2, new Quad(400, 300, 800, 600), 1);
+      // testRegion.draw(this.canvas2, new Quad(400, 0, 800, 600), 1);
     },
     draw() {
       this.tick();

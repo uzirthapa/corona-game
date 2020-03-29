@@ -15,6 +15,14 @@ export default class Point {
     return new Point(this.x + otherPoint.x, this.y + otherPoint.y);
   }
 
+  sub(otherPoint) {
+    return new Point(this.x - otherPoint.x, this.y - otherPoint.y);
+  }
+
+  scale(factor) {
+    return new Point(this.x * factor, this.y * factor);
+  }
+
   floor() {
     return new Point(Math.floor(this.x), Math.floor(this.y));
   }

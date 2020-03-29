@@ -32,8 +32,8 @@ export default class Person {
     return {...this.pos.toObj(), r: this.radius};
   }
 
-  updatePos(maxX, maxY){
-    this.pos = this.pos.add(this.moveVector);
+  updatePos(maxX, maxY, configs = {}){
+    this.pos = this.pos.add(this.moveVector.scale(configs.moveSpeed || 1));
     if ((this.pos.x - this.radius < 0) || (this.pos.x + this.radius > maxX)){
       this.moveVector.x *= -1;
     }
@@ -73,6 +73,30 @@ export default class Person {
   updateSickTime(ticksPerDay) {
     this.ticksSick += 1;
     this.daysSick = Math.floor(this.ticksSick / ticksPerDay);
+  }
+
+  checkRecoverOrDeath2(configs){
+    const ticksPerDay = configs.ticksPerDay || 100;
+    const recoveryRate = configs.recoveryRate || 0.2;
+    const deathRate = configs.deathRate || 0.05;
+    const minDaysSick = configs.minDaysSick || 14;
+
+    this.updateSickTime(ticksPerDay);
+
+    if (this.ticksSick % ticksPerDay === 0){
+      if (this.daysSick >= minDaysSick){
+        const rand = Math.random();
+        if (rand < recoveryRate){
+          // They recover
+          this.immune = true;
+          this.healthy = true;
+        } else if (rand < recoveryRate + deathRate){
+          // adding is necessary unless we want to recalculate a random number
+          // they die
+          this.alive = false;
+        }
+      }
+    }
   }
 
   checkRecoverOrDeath(ticksPerDay) {
