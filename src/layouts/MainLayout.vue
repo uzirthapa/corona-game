@@ -176,14 +176,19 @@
                   <v-flex xs12 :key="i">
                     <v-tooltip left max-width="200">
                       <template v-slot:activator="{ on }">
-                        <v-card v-on="on" @click="runCdcPower(power)" outlined class="pa-3">
+                        <v-card :disabled="power.used" v-on="on" @click="runCdcPower(power)" outlined class="pa-3">
                           <v-layout align-center>
                             <v-avatar color="teal" size="48">
                               <span class="white--text headline">{{power.icon}}</span>
                             </v-avatar>
-                            <div class="ml-3">
+                            <div class="ml-3" :style="power.used ? 'text-decoration: line-through' : ''">
                               {{power.title}}
                             </div>
+                            <v-flex v-if="power.used" text-end>
+                              <v-chip class="font-weight-bold" small label color="red">
+                                Expired
+                              </v-chip>
+                            </v-flex>
                           </v-layout>
                         </v-card>
                       </template>
@@ -204,41 +209,19 @@
                   <v-flex xs12 :key="i">
                     <v-tooltip left max-width="200">
                       <template v-slot:activator="{ on }">
-                        <v-card v-on="on" @click="runGovtPower(power)" outlined class="pa-3">
+                        <v-card :disabled="power.used" v-on="on" @click="runGovtPower(power)" outlined class="pa-3">
                           <v-layout align-center>
                             <v-avatar color="indigo" size="48">
                               <span class="white--text headline">{{power.icon}}</span>
                             </v-avatar>
-                            <div class="ml-3">
+                            <div class="ml-3" :style="power.used ? 'text-decoration: line-through' : ''">
                               {{power.title}}
                             </div>
-                            <!--<v-flex text-right>-->
-                            <!--<v-menu-->
-                            <!--:close-on-content-click="false"-->
-                            <!--:nudge-width="200"-->
-                            <!--offset-x-->
-                            <!--&gt;-->
-                            <!--<template v-slot:activator="{ on }">-->
-                            <!--<v-btn-->
-                            <!--color="indigo"-->
-                            <!--dark-->
-                            <!--icon-->
-                            <!--v-on="on"-->
-                            <!--&gt;-->
-                            <!--<v-icon>-->
-                            <!--mdi-information-->
-                            <!--</v-icon>-->
-                            <!--</v-btn>-->
-                            <!--</template>-->
-                            <!--<v-card>-->
-                            <!--<v-card-text>-->
-                            <!--{{power.description}}-->
-                            <!--</v-card-text>-->
-                            <!--</v-card>-->
-
-                            <!--</v-menu>-->
-
-                            <!--</v-flex>-->
+                            <v-flex v-if="power.used" text-end>
+                              <v-chip class="font-weight-bold" small label color="red">
+                                Expired
+                              </v-chip>
+                            </v-flex>
                           </v-layout>
 
                         </v-card>
@@ -345,6 +328,7 @@
             tag: 'washHands',
             factor: 0.95,
             icon: "XX",
+            used: false,
             description: "This will limit the spread of germs by 1/2 because people will be washing them away"
           },
           {
@@ -352,6 +336,7 @@
             tag: 'cdcSpeech',
             factor: 0.85,
             icon: "XX",
+            used: false,
             description: "This will limit the spread of germs by 1/2 because people will be washing them away"
           },
           {
@@ -359,6 +344,7 @@
             tag: 'vaccine',
             factor: 0.15,
             icon: "XX",
+            used: false,
             description: "This will limit the spread of germs by 1/2 because people will be washing them away"
           },
           {
@@ -366,6 +352,7 @@
             tag: 'newHospital',
             factor: 1.50,
             icon: "XX",
+            used: false,
             description: "This increases peoples recovery rate by 50%"
           },
 
@@ -376,6 +363,7 @@
             tag: 'socialDistancing',
             factor: 0.50,
             icon: "XX",
+            used: false,
             description: "This will reduce spread rate by 50%"
           },
           {
@@ -383,6 +371,7 @@
             tag: 'stayHome',
             factor: 0.05,
             icon: "XX",
+            used: false,
             description: "This will slow population of non essential employees to 5%"
           },
           {
@@ -390,6 +379,7 @@
             tag: 'lockDown',
             factor: 0.05,
             icon: "XX",
+            used: false,
             description: "This will decrease movement to 0 for all except 5% of population for 5 days"
           },
           {
@@ -397,6 +387,7 @@
             tag: 'washHands',
             factor: 0.05,
             icon: "XX",
+            used: false,
             description: "Coming soon - This will limit traffic from each region to 5% for 5 days"
           },
         ],
@@ -477,6 +468,7 @@
               "updateVaccineUsed"
       ]),
       runGovtPower(power) {
+        power.used = true
         console.log(power)
         switch(power.tag) {
           case 'socialDistancing':
@@ -497,9 +489,11 @@
       },
       runCdcPower(power) {
         console.log(power)
+        power.used = true
         switch(power.tag) {
           case 'washHands':
             console.log(power.factor)
+
             this.updateWashHandsFactor(power.factor)
             break;
           case 'cdcSpeech':
