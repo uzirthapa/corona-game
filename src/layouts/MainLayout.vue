@@ -16,7 +16,7 @@
           </div>
 
           <div class="pb-2">
-            <v-card v-if="counts.counts" dark width="100%" class="pa-2">
+            <v-card v-if="globalTotals" dark width="100%" class="pa-2">
               <v-layout wrap>
                 <v-flex text-center xs6>
                   <v-card outlined>
@@ -25,7 +25,7 @@
                   Population
                   </div>
                   <div :class="`display-1 font-weight-bold --text`">
-                    {{counts.counts.totalAlive}}
+                    {{globalTotals.totalAlive}}
                   </div>
                   </v-flex>
                   </v-card>
@@ -37,7 +37,7 @@
                         Recovered
                       </div>
                       <div :class="`display-1 font-weight-bold green--text`">
-                        {{counts.counts.Immune}}
+                        {{globalTotals.totalImmune}}
                       </div>
                     </v-flex>
                   </v-card>
@@ -49,7 +49,7 @@
                         Infected
                       </div>
                       <div :class="`display-1 font-weight-bold orange--text`">
-                        {{counts.counts.Sick}}
+                        {{globalTotals.totalSick}}
                       </div>
                     </v-flex>
                   </v-card>
@@ -61,7 +61,7 @@
                         Dead
                       </div>
                       <div :class="`display-1 font-weight-bold red--text`">
-                        {{counts.counts.Dead}}
+                        {{globalTotals.totalDead}}
                       </div>
                     </v-flex>
                   </v-card>
@@ -457,7 +457,8 @@
     computed: {
       ...mapGetters({
         counts: 'counts',
-        daysPassed: 'days'
+        daysPassed: 'days',
+        globalTotals: 'globalTotals',
       })
     },
     mounted() {

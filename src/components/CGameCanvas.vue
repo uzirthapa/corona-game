@@ -1,5 +1,9 @@
 <template>
-  <v-container fluid class="pa-0" style="width: 100%; height: 100%;">
+  <v-container
+    fluid
+    class="pa-0"
+    style="width: 100%; height: 100%;"
+  >
     <v-row class="text-center px-2">
       <v-col>
         <canvas
@@ -31,7 +35,25 @@
     </v-row>
     <v-row>
       <v-col>
-        Test
+        <v-btn
+          @click="start"
+          :disabled="!!timer || ended"
+        >Start
+        </v-btn>
+
+        <v-btn
+          @click="playPause"
+          :disabled="!timer"
+        >
+          {{this.paused ? 'Play' : 'Pause'}}
+        </v-btn>
+
+        <v-btn
+          @click="reset"
+          :disabled="!ended"
+          >
+          Reset
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -41,39 +63,41 @@
 import Quad from './Quad';
 import Region from './Region';
 
-const testRegion = new Region('Test Region', new Quad(0, 0, 500, 400));
-testRegion.initialize(500);
-const testViewPort = new Quad(0, 0, 500, 400);
-import {mapMutations, mapGetters} from 'vuex'
+import {mapMutations, mapGetters} from 'vuex';
+
 export default {
   name: 'GameCanvas',
   data: () => ({
     canvas: null,
     timer: null,
+    paused: false,
+    ended: false,
     counts: {},
     ticksPassed: 0,
     daysPassed: 0,
 
-    regions: [],
+    regions: [
+      new Region('Test Region', new Quad(0, 0, 500, 400)),
+    ],
     testViewPort: new Quad(0, 0, 500, 400),
-    initialHealthy: 99,
+    initialHealthy: 10,
     initialSick: 1,
-    totalCounts: {}
+    totalCounts: {},
   }),
   created() {
-    this.canvas = this.$refs.canvas;
-    console.log(this.canvas);
+    this.reset();
     const vm = this;
     this.$nextTick(
       () => {
         vm.canvas = vm.$refs.canvas;
+        vm.drawBackground();
         console.log('Canvas', vm.canvas);
-        vm.timer = setInterval(
-          () => {
-            vm.draw();
-          },
-          10,
-        );
+        // vm.timer = setInterval(
+        //   () => {
+        //     vm.draw();
+        //   },
+        //   10,
+        // );
       },
     );
     // var vm = this;
@@ -90,9 +114,7 @@ export default {
     // return this.timer;
   },
   computed: {
-    ...mapGetters({
-
-               }),
+    ...mapGetters({}),
     configs() {
       return {
         ticksPerDay: 100,
@@ -128,24 +150,65 @@ export default {
   },
   methods: {
     ...mapMutations([
-       'updateCounts',
-            'updateDays'
+      'updateCounts',
+      'updateDays',
     ]),
+    playPause(){
+      this.paused = !this.paused;
+    },
+    reset() {
+      this.drawBackground();
+      this.paused = false;
+      this.ended = false;
+
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+
+      this.regions.forEach(
+        region => {
+          region.reset();
+          region.initialize(this.initialHealthy, this.initialSick);
+        },
+      );
+    },
+    start() {
+      if (this.timer) {
+        return;
+      }
+
+      if (!this.canvas) {
+        return;
+      }
+
+      this.timer = setInterval(this.step, 10);
+    },
+    step() {
+      if (this.paused) {
+        return;
+      }
+      this.tick();
+      this.draw();
+      this.checkEnd();
+    },
     tick() {
       // pretick all regions
-      testRegion.preTick(this.configs);
+      this.regions.forEach(region => region.preTick(this.configs));
 
       // then tick all regions
-      testRegion.tick(this.configs);
+      this.regions.forEach(region => region.tick(this.configs));
 
       // update counts
-      this.$set(this.counts, 'counts', testRegion.getCounts());
+      this.regions.forEach(region => {
+        this.$set(this.counts, region.name, region.getCounts());
+      });
 
-      this.totalCounts = {
-        counts: testRegion.getCounts(),
-        region: testRegion.name,
-      }
-      this.updateCounts(this.totalCounts)
+      // this.totalCounts = {
+      //   counts: testRegion.getCounts(),
+      //   region: testRegion.name,
+      // };
+      this.updateCounts(this.counts);
 
 
       this.ticksPassed += 1;
@@ -153,21 +216,32 @@ export default {
         this.ticksPassed = 0;
         this.daysPassed += 1;
       }
-      this.updateDays(this.daysPassed)
+      this.updateDays(this.daysPassed);
     },
     draw() {
-      this.tick();
-      this.canvas.getContext('2d').clearRect(0, 0, this.canvas.width, this.canvas.height);
-      testRegion.draw(this.canvas, testViewPort, 1);
-      this.checkEnd();
+      this.drawBackground();
+      this.regions.forEach(region => region.draw(this.canvas, this.testViewPort, 1));
+    },
+    drawBackground() {
+      if (!this.canvas){
+        return;
+      }
+      const ctx = this.canvas.getContext('2d');
+      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      // this.canvas.getContext('2d').clearRect(0, 0, this.canvas.width, this.canvas.height);
+
     },
     checkEnd() {
       if (this.totalSick === 0) {
+        this.ended = true;
         clearInterval(this.timer);
+        this.timer = null;
       }
     },
     vaccinate(percentage) {
-      testRegion.vaccinate(percentage);
+      this.regions.forEach(region => region.vaccinate(percentage));
     },
   },
 };
