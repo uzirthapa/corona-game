@@ -7,7 +7,8 @@ const radius = 4;
 const r2 = radius * radius;
 
 export default class Region {
-  constructor(quad, wallThickness = 1) {
+  constructor(name, quad, wallThickness = 1) {
+    this.name = name;
     this.quad = quad;
     this.wallThickness = wallThickness;
 
@@ -59,6 +60,21 @@ export default class Region {
 
   getCount(healthStatus) {
     return this[healthStatus.name].count;
+  }
+
+  getCounts() {
+    const counts = {totalAlive: 0};
+    Object.keys(HealthStatuses).forEach(
+      statusName => {
+        const count = this[statusName].length;
+        counts[statusName] = count;
+        if (statusName !== HealthStatuses.Dead.name) {
+          counts.totalAlive += count;
+        }
+      },
+    );
+
+    return counts;
   }
 
   preTick(configs = {}) {
