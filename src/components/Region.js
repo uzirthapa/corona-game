@@ -116,7 +116,10 @@ export default class Region {
     // todo fix this method - it is VERY inefficient and slows things down a lot when there are many people
     // todo: use a modified divide and conquer on subregions?
 
-    const spreadChance = configs.spreadChance || 0.1;
+    const baseSpreadChance = configs.spreadChance || 0.1;
+    const washHandsFactor = configs.washHandsFactor || 1;
+
+    const spreadChance = baseSpreadChance * washHandsFactor;
 
     // Check each Healthy person to see if they get sick
     this.Healthy.forEach(

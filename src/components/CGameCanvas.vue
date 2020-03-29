@@ -2,7 +2,7 @@
   <v-container
     fluid
     class="pa-0"
-    style="width: 100%; height: 100%;"
+    style="width: 100%; height: 100%; overflow-y: auto;"
   >
     <v-row class="text-center px-2">
       <v-col>
@@ -15,23 +15,11 @@
           Sorry, browser does not support canvas.
         </canvas>
       </v-col>
-      <!--      <v-col>-->
-      <!--        <div>-->
-      <!--          {{counts}}-->
-      <!--        </div>-->
-      <!--        <div>-->
-      <!--          Total sick: {{totalSick}}-->
-      <!--        </div>-->
-      <!--        <div>-->
-      <!--          Ticks today: {{ticksPassed}}<br/>-->
-      <!--          Days passed: {{daysPassed}}-->
-      <!--        </div>-->
-      <!--        <div v-if="totalExisting > 0">-->
-      <!--          Alive%: {{totalAlive * 100 / totalExisting}}<br/>-->
-      <!--          Sick%: {{totalSick * 100 / totalExisting}}<br/>-->
-      <!--          Dead%: {{totalDead * 100 / totalExisting}}-->
-      <!--        </div>-->
-      <!--      </v-col>-->
+            <v-col>
+              <div>
+                {{configs}}
+              </div>
+            </v-col>
     </v-row>
     <v-row justify="center">
       <v-col class="d-flex justify-center">
@@ -114,7 +102,9 @@ export default {
     // return this.timer;
   },
   computed: {
-    ...mapGetters({}),
+    ...mapGetters({
+      washHandsFactor: 'washHandsFactor',
+    }),
     configs() {
       return {
         ticksPerDay: 100,
@@ -124,7 +114,7 @@ export default {
         deathRate: 0.05, // rates need to be between 0-1 (inclusive)
         spreadChance: 0.1, // chances need to be between 0-1 (inclusive),
 
-        washHandsFactor: 1, // Wash Hands getter
+        washHandsFactor: this.washHandsFactor, // Wash Hands getter
         cdcSpeechFactor: 1, // Speech by CDC getter
         newHospitalFactor: 1, // Open new hospital getter
         socialDistancingFactor: 1, // Social Distancing getter
