@@ -15,26 +15,26 @@
           Sorry, browser does not support canvas.
         </canvas>
       </v-col>
-      <v-col>
-        <div>
-          {{counts}}
-        </div>
-        <div>
-          Total sick: {{totalSick}}
-        </div>
-        <div>
-          Ticks today: {{ticksPassed}}<br/>
-          Days passed: {{daysPassed}}
-        </div>
-        <div v-if="totalExisting > 0">
-          Alive%: {{totalAlive * 100 / totalExisting}}<br/>
-          Sick%: {{totalSick * 100 / totalExisting}}<br/>
-          Dead%: {{totalDead * 100 / totalExisting}}
-        </div>
-      </v-col>
+      <!--      <v-col>-->
+      <!--        <div>-->
+      <!--          {{counts}}-->
+      <!--        </div>-->
+      <!--        <div>-->
+      <!--          Total sick: {{totalSick}}-->
+      <!--        </div>-->
+      <!--        <div>-->
+      <!--          Ticks today: {{ticksPassed}}<br/>-->
+      <!--          Days passed: {{daysPassed}}-->
+      <!--        </div>-->
+      <!--        <div v-if="totalExisting > 0">-->
+      <!--          Alive%: {{totalAlive * 100 / totalExisting}}<br/>-->
+      <!--          Sick%: {{totalSick * 100 / totalExisting}}<br/>-->
+      <!--          Dead%: {{totalDead * 100 / totalExisting}}-->
+      <!--        </div>-->
+      <!--      </v-col>-->
     </v-row>
-    <v-row>
-      <v-col>
+    <v-row justify="center">
+      <v-col class="d-flex justify-center">
         <v-btn
           @click="start"
           :disabled="!!timer || ended"
@@ -51,7 +51,7 @@
         <v-btn
           @click="reset"
           :disabled="!ended"
-          >
+        >
           Reset
         </v-btn>
       </v-col>
@@ -80,7 +80,7 @@ export default {
       new Region('Test Region', new Quad(0, 0, 500, 400)),
     ],
     testViewPort: new Quad(0, 0, 500, 400),
-    initialHealthy: 10,
+    initialHealthy: 249,
     initialSick: 1,
     totalCounts: {},
   }),
@@ -118,7 +118,7 @@ export default {
     configs() {
       return {
         ticksPerDay: 100,
-        moveSpeed: 1,
+        moveSpeed: 2,
         minDaysSick: 14,
         recoveryRate: 0.2, // rates need to be between 0-1 (inclusive)
         deathRate: 0.05, // rates need to be between 0-1 (inclusive)
@@ -153,7 +153,7 @@ export default {
       'updateCounts',
       'updateDays',
     ]),
-    playPause(){
+    playPause() {
       this.paused = !this.paused;
     },
     reset() {
@@ -200,16 +200,7 @@ export default {
       this.regions.forEach(region => region.tick(this.configs));
 
       // update counts
-      this.regions.forEach(region => {
-        this.$set(this.counts, region.name, region.getCounts());
-      });
-
-      // this.totalCounts = {
-      //   counts: testRegion.getCounts(),
-      //   region: testRegion.name,
-      // };
-      this.updateCounts(this.counts);
-
+      this.updateAllCounts();
 
       this.ticksPassed += 1;
       if (this.ticksPassed % this.configs.ticksPerDay === 0) {
@@ -218,12 +209,19 @@ export default {
       }
       this.updateDays(this.daysPassed);
     },
+    updateAllCounts() {
+      this.regions.forEach(region => {
+        this.$set(this.counts, region.name, region.getCounts());
+      });
+
+      this.updateCounts(this.counts);
+    },
     draw() {
       this.drawBackground();
       this.regions.forEach(region => region.draw(this.canvas, this.testViewPort, 1));
     },
     drawBackground() {
-      if (!this.canvas){
+      if (!this.canvas) {
         return;
       }
       const ctx = this.canvas.getContext('2d');

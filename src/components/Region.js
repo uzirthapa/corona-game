@@ -4,7 +4,7 @@ import HealthStatuses from './HealthStatus';
 import Jobs from './Jobs';
 // import Quad from './Quad';
 
-const radius = 2;
+const radius = 3;
 const r2 = radius * radius;
 
 export default class Region {
@@ -154,7 +154,7 @@ export default class Region {
 
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, this.quad.width, this.quad.height);
-    ctx.fillStyle = '#AAAAFF';
+    ctx.fillStyle = '#eeeeff';
     ctx.fillRect(this.wallThickness, this.wallThickness, this.quad.width - 2 * this.wallThickness, this.quad.height - 2 * this.wallThickness);
     ctx.fillStyle = '#000000';
     this.Healthy.forEach(
@@ -176,7 +176,7 @@ export default class Region {
         );
       },
     );
-    ctx.fillStyle = '#FF0000';
+    ctx.fillStyle = '#FF9800';
     this.Sick.forEach(
       person => {
         this.drawBall(
