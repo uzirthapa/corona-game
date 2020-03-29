@@ -41,7 +41,7 @@ export default class Person {
     const cdcSpeechFactor = configs.cdcSpeechFactor || 1;
     const socialDistancingFactor = configs.socialDistancingFactor || 1;
     const stayAtHomeFactor = configs.stayAtHomeFactor || 1;
-    const lockDownFactor = configs.lockDownFactor || 1;
+    const lockDownFactor = configs.lockDownFactor === undefined ? 1 : configs.lockDownFactor;
 
     let moveSpeed = baseMoveSpeed * cdcSpeechFactor * socialDistancingFactor;
     if (stayAtHomeFactor < 1 && this.job.canRemote) {
@@ -95,9 +95,20 @@ export default class Person {
 
   checkRecoverOrDeath2(configs) {
     const ticksPerDay = configs.ticksPerDay || 100;
-    const recoveryRate = configs.recoveryRate || 0.2;
-    const deathRate = configs.deathRate || 0.05;
+    const baseRecoveryRate = configs.recoveryRate || 0.2;
+    let deathRate = configs.deathRate || 0.05;
     const minDaysSick = configs.minDaysSick || 14;
+    const newHospitalFactor = configs.newHospitalFactor || 1;
+
+    let recoveryRate = baseRecoveryRate * newHospitalFactor;
+
+    // ensure that the sum of the death and recovery rates are less than 1.
+    // If greater, scale the rates so the proportion stays the same, but the sum is 1
+    const sum = recoveryRate + deathRate;
+    if (sum > 1){
+      recoveryRate /= sum;
+      deathRate /= sum;
+    }
 
     this.updateSickTime(ticksPerDay);
 

@@ -16,7 +16,7 @@ export default new Vuex.Store({
 
     counts: {},
     radius: 0,
-    days: null,
+    days: 0,
     // moveSpeed: 2,
     // minDaysSick: 14,
     // recoveryRate: 0.2, // rates need to be between 0-1 (inclusive)
@@ -29,6 +29,7 @@ export default new Vuex.Store({
     socialDistancingFactor: 1, // Social Distancing getter
     stayAtHomeFactor: 1, // Stay at home order getter
     lockDownFactor: 1, // Lock down order getter
+    lockDownDay: 0,
     vaccinePercentage: 0, // This should be set to the percentage (in decimal form) of Healthy people to make immune
     vaccineUsed: 0,
     // note that the "Vaccine notice" will need a method that is called via a Watcher when that button is pressed
@@ -123,6 +124,7 @@ export default new Vuex.Store({
     },
     updateLockDownFactor(state, value) {
       state.lockDownFactor = value;
+      state.lockDownDay = state.days || 0;
     },
     updateVaccinePercentage(state, value) {
       state.vaccinePercentage = value;

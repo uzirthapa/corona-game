@@ -15,23 +15,11 @@
           Sorry, browser does not support canvas.
         </canvas>
       </v-col>
-      <!--      <v-col>-->
-      <!--        <div>-->
-      <!--          {{counts}}-->
-      <!--        </div>-->
-      <!--        <div>-->
-      <!--          Total sick: {{totalSick}}-->
-      <!--        </div>-->
-      <!--        <div>-->
-      <!--          Ticks today: {{ticksPassed}}<br/>-->
-      <!--          Days passed: {{daysPassed}}-->
-      <!--        </div>-->
-      <!--        <div v-if="totalExisting > 0">-->
-      <!--          Alive%: {{totalAlive * 100 / totalExisting}}<br/>-->
-      <!--          Sick%: {{totalSick * 100 / totalExisting}}<br/>-->
-      <!--          Dead%: {{totalDead * 100 / totalExisting}}-->
-      <!--        </div>-->
-      <!--      </v-col>-->
+<!--      <v-col>-->
+<!--        <div>-->
+<!--          {{configs}}-->
+<!--        </div>-->
+<!--      </v-col>-->
     </v-row>
     <v-row justify="center">
       <v-col class="d-flex justify-center">
@@ -63,7 +51,7 @@
 import Quad from './Quad';
 import Region from './Region';
 
-import {mapMutations, mapGetters} from 'vuex';
+import {mapState, mapMutations, mapGetters} from 'vuex';
 
 export default {
   name: 'GameCanvas',
@@ -91,30 +79,23 @@ export default {
       () => {
         vm.canvas = vm.$refs.canvas;
         vm.drawBackground();
-        console.log('Canvas', vm.canvas);
-        // vm.timer = setInterval(
-        //   () => {
-        //     vm.draw();
-        //   },
-        //   10,
-        // );
       },
     );
-    // var vm = this;
-    // this.$nextTick(() => {
-    //   vm.canvas = document.getElementById('canvas');
-    //   vm.timer = setInterval(
-    //     () => {
-    //       vm.draw();
-    //     },
-    //     10,
-    //   );
-    // });
-    //
-    // return this.timer;
   },
   computed: {
-    ...mapGetters({}),
+    ...mapState({
+      lockDownDay: state => state.lockDownDay,
+      daysActive: state => state.days,
+    }),
+    ...mapGetters({
+      washHandsFactor: 'washHandsFactor',
+      cdcSpeechFactor: 'cdcSpeechFactor',
+      newHospitalFactor: 'newHospitalFactor',
+      vaccinePercentage: 'vaccinePercentage',
+      socialDistancingFactor: 'socialDistancingFactor',
+      stayAtHomeFactor: 'stayAtHomeFactor',
+      lockDownFactor: 'lockDownFactor',
+    }),
     configs() {
       return {
         ticksPerDay: 100,
@@ -124,13 +105,12 @@ export default {
         deathRate: 0.05, // rates need to be between 0-1 (inclusive)
         spreadChance: 0.1, // chances need to be between 0-1 (inclusive),
 
-        washHandsFactor: 1, // Wash Hands getter
-        cdcSpeechFactor: 1, // Speech by CDC getter
-        newHospitalFactor: 1, // Open new hospital getter
-        socialDistancingFactor: 1, // Social Distancing getter
-        stayAtHomeFactor: 1, // Stay at home order getter
-        lockDownFactor: 1, // Lock down order getter
-        vaccinePercentage: 0, // This should be set to the percentage (in decimal form) of Healthy people to make immune
+        washHandsFactor: this.washHandsFactor, // Wash Hands getter
+        cdcSpeechFactor: this.cdcSpeechFactor, // Speech by CDC getter
+        newHospitalFactor: this.newHospitalFactor, // Open new hospital getter
+        socialDistancingFactor: this.socialDistancingFactor, // Social Distancing getter
+        stayAtHomeFactor: this.stayAtHomeFactor, // Stay at home order getter
+        lockDownFactor: this.lockDownFactor, // Lock down order getter
         // note that the "Vaccine notice" will need a method that is called via a Watcher when that button is pressed
         // since this is a "one and done" effect instead of a continuous effect
       };
@@ -152,6 +132,7 @@ export default {
     ...mapMutations([
       'updateCounts',
       'updateDays',
+      'updateLockDownFactor',
     ]),
     playPause() {
       this.paused = !this.paused;
@@ -206,8 +187,15 @@ export default {
       if (this.ticksPassed % this.configs.ticksPerDay === 0) {
         this.ticksPassed = 0;
         this.daysPassed += 1;
+        this.onDayEnd();
       }
+    },
+    onDayEnd() {
       this.updateDays(this.daysPassed);
+
+      if (this.lockDownFactor !== 1 && (this.lockDownDay + 5 < this.daysActive)) {
+        this.updateLockDownFactor(1);
+      }
     },
     updateAllCounts() {
       this.regions.forEach(region => {
@@ -240,6 +228,13 @@ export default {
     },
     vaccinate(percentage) {
       this.regions.forEach(region => region.vaccinate(percentage));
+    },
+  },
+  watch: {
+    vaccinePercentage(newVal, oldVal) {
+      if (oldVal === 0 && newVal > 0) {
+        this.vaccinate(newVal);
+      }
     },
   },
 };
