@@ -1,11 +1,12 @@
 <template>
-  <v-container>
-    <v-row class="text-center">
+  <v-container fluid class="pa-0" style="width: 100%; height: 100%;">
+    <v-row class="text-center px-2">
       <v-col>
         <canvas
           id="canvas"
           width="500"
           height="400"
+          ref="canvas"
         >
           Sorry, browser does not support canvas.
         </canvas>
@@ -28,6 +29,11 @@
         </div>
       </v-col>
     </v-row>
+    <v-row>
+      <v-col>
+        Test
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -47,40 +53,70 @@ export default {
     counts: {},
     ticksPassed: 0,
     daysPassed: 0,
+
+    regions: [],
+    testViewPort: new Quad(0, 0, 500, 400),
+    initialHealthy: 99,
+    initialSick: 1,
   }),
   created() {
-    var vm = this;
-    this.$nextTick(() => {
-      vm.canvas = document.getElementById('canvas');
-      vm.timer = setInterval(
-        () => {
-          vm.draw();
-        },
-        10,
-      );
-    });
-
-    return this.timer;
+    this.canvas = this.$refs.canvas;
+    console.log(this.canvas);
+    const vm = this;
+    this.$nextTick(
+      () => {
+        vm.canvas = vm.$refs.canvas;
+        console.log('Canvas', vm.canvas);
+        vm.timer = setInterval(
+          () => {
+            vm.draw();
+          },
+          10,
+        );
+      },
+    );
+    // var vm = this;
+    // this.$nextTick(() => {
+    //   vm.canvas = document.getElementById('canvas');
+    //   vm.timer = setInterval(
+    //     () => {
+    //       vm.draw();
+    //     },
+    //     10,
+    //   );
+    // });
+    //
+    // return this.timer;
   },
   computed: {
     configs() {
       return {
         ticksPerDay: 100,
-        moveSpeed: 2,
+        moveSpeed: 1,
         minDaysSick: 14,
         recoveryRate: 0.2, // rates need to be between 0-1 (inclusive)
         deathRate: 0.05, // rates need to be between 0-1 (inclusive)
-        spreadChance: 0.1, // chances need to be between 0-1 (inclusive)
+        spreadChance: 0.1, // chances need to be between 0-1 (inclusive),
+
+        washHandsFactor: 1, // Wash Hands getter
+        cdcSpeechFactor: 1, // Speech by CDC getter
+        newHospitalFactor: 1, // Open new hospital getter
+        socialDistancingFactor: 1, // Social Distancing getter
+        stayAtHomeFactor: 1, // Stay at home order getter
+        lockDownFactor: 1, // Lock down order getter
+        vaccinePercentage: 0, // This should be set to the percentage (in decimal form) of Healthy people to make immune
+        // note that the "Vaccine notice" will need a method that is called via a Watcher when that button is pressed
+        // since this is a "one and done" effect instead of a continuous effect
       };
     },
     totalSick() {
-      return Object.values(this.counts).reduce((total, {Sick}) => total += Sick, 0);
+      return Object.values(this.counts).reduce((total, {Sick}) => total + Sick, 0);
     },
     totalAlive() {
-      return Object.values(this.counts).reduce((total, {totalAlive}) => total += totalAlive, 0);
+      return Object.values(this.counts).reduce((total, {totalAlive}) => total + totalAlive, 0);
     },
     totalDead() {
-      return Object.values(this.counts).reduce((total, {Dead}) => total += Dead, 0);
+      return Object.values(this.counts).reduce((total, {Dead}) => total + Dead, 0);
     },
     totalExisting() {
       return this.totalAlive + this.totalDead;
@@ -113,6 +149,9 @@ export default {
       if (this.totalSick === 0) {
         clearInterval(this.timer);
       }
+    },
+    vaccinate(percentage) {
+      testRegion.vaccinate(percentage);
     },
   },
 };

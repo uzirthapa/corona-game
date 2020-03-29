@@ -1,9 +1,10 @@
 import Point from './Point';
 import Person from './Person';
 import HealthStatuses from './HealthStatus';
+import Jobs from './Jobs';
 // import Quad from './Quad';
 
-const radius = 4;
+const radius = 2;
 const r2 = radius * radius;
 
 export default class Region {
@@ -16,6 +17,14 @@ export default class Region {
     this.Sick = [];
     this.Immune = [];
     this.Dead = [];
+  }
+
+  reset() {
+    Object.keys(HealthStatuses).forEach(
+      key => {
+        this[key] = [];
+      },
+    );
   }
 
   initialize(numHealthy, numSick = 1) {
@@ -55,7 +64,9 @@ export default class Region {
       vec = new Point(dx, dy);
     }
 
-    return new Person(pos, vec, radius);
+    const jobRand = Math.random();
+    const job = jobRand < 0.5 ? Jobs.NonRemote : Jobs.Remote;
+    return new Person(pos, vec, radius, job);
   }
 
   getCount(healthStatus) {
@@ -195,5 +206,26 @@ export default class Region {
     context.beginPath();
     context.arc(pos.x, pos.y, radius, 0, Math.PI * 2, true);
     context.fill();
+  }
+
+  vaccinate(percentage) {
+    // move/filter the newly immune
+    const newHealthy = [];
+
+    this.Healthy.forEach(
+      person => {
+        if (Math.random() < percentage) {
+          // immunize them
+          person.immune = true;
+          this.Immune.push(person);
+        } else {
+          // They stay healthy
+          newHealthy.push(person);
+        }
+      },
+    );
+
+    // Update the Healthy array
+    this.Healthy = newHealthy;
   }
 }
