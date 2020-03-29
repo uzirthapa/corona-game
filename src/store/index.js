@@ -1,7 +1,11 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from 'vue';
+import Vuex from 'vuex';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
+
+function totalCounts(obj, key) {
+  return Object.values(obj).reduce((total, current) => total + (current[key] || 0), 0);
+}
 
 export default new Vuex.Store({
   state: {
@@ -33,107 +37,130 @@ export default new Vuex.Store({
   },
   getters: {
     counts(state) {
-      return state.counts
+      return state.counts;
     },
     days(state) {
-      return state.days
+      return state.days;
     },
-    moveSpeed (state) {
-      return state.moveSpeed
+    moveSpeed(state) {
+      return state.moveSpeed;
     },
     minDaysSick(state) {
-      return state.minDaysSick
+      return state.minDaysSick;
     },
     recoveryRate(state) {
-      return state.recoveryRate
+      return state.recoveryRate;
     },
     deathRate(state) {
-      return state.deathRate
+      return state.deathRate;
     },
     spreadChance(state) {
-      return state.spreadChance
+      return state.spreadChance;
     },
     washHandsFactor(state) {
-      return state.washHandsFactor
+      return state.washHandsFactor;
     },
     cdcSpeechFactor(state) {
-      return state.cdcSpeechFactor
+      return state.cdcSpeechFactor;
     },
     newHospitalFactor(state) {
-      return state.newHospitalFactor
+      return state.newHospitalFactor;
     },
     socialDistancingFactor(state) {
-      return state.socialDistancingFactor
+      return state.socialDistancingFactor;
     },
     stayAtHomeFactor(state) {
-      return state.stayAtHomeFactor
+      return state.stayAtHomeFactor;
     },
     lockDownFactor(state) {
-      return state.lockDownFactor
+      return state.lockDownFactor;
     },
     vaccinePercentage(state) {
-      return state.vaccinePercentage
+      return state.vaccinePercentage;
+    },
+
+    totalAlive(state) {
+      return totalCounts(state.counts, 'totalAlive');
+    },
+    totalSick(state) {
+      return totalCounts(state.counts, 'Sick');
+    },
+    totalDead(state) {
+      return totalCounts(state.counts, 'Dead');
+    },
+    totalImmune(state) {
+      return totalCounts(state.counts, 'Immune');
+    },
+    totalHealthy(state) {
+      return totalCounts(state.counts, 'Healthy');
+    },
+    globalTotals(state, getters) {
+      return {
+        totalAlive: getters.totalAlive,
+        totalSick: getters.totalSick,
+        totalDead: getters.totalDead,
+        totalImmune: getters.totalImmune,
+        totalHealthy: getters.totalHealthy,
+      };
     },
 
   },
   mutations: {
     updateWashHandsFactor(state, value) {
-      state.washHandsFactor = value
+      state.washHandsFactor = value;
     },
     updateCdcSpeechFactor(state, value) {
-      state.cdcSpeechFactor = value
+      state.cdcSpeechFactor = value;
     },
     updateNewHospitalFactor(state, value) {
-      state.newHospitalFactor = value
+      state.newHospitalFactor = value;
     },
     updateSocialDistancingFactor(state, value) {
-      state.socialDistancingFactor = value
+      state.socialDistancingFactor = value;
     },
     updateStayAtHomeFactor(state, value) {
-      state.stayAtHomeFactor = value
+      state.stayAtHomeFactor = value;
     },
     updateLockDownFactor(state, value) {
-      state.lockDownFactor = value
+      state.lockDownFactor = value;
     },
     updateVaccinePercentage(state, value) {
-      state.vaccinePercentage = value
+      state.vaccinePercentage = value;
     },
     updateVaccineUsed(state, value) {
-      state.vaccineUsed = value
+      state.vaccineUsed = value;
     },
 
-    updateCounts(state, value){
-      state.counts = value
+    updateCounts(state, value) {
+      state.counts = value;
     },
     updateSpreadRate(state, value) {
-      state.spreadRate = value
+      state.spreadRate = value;
     },
     updateRadius(state, value) {
-      state.radius = value
+      state.radius = value;
     },
     updateDays(state, value) {
-      state.days = value
+      state.days = value;
     },
     updateDeathRate(state, value) {
-      state.deathRate = value
+      state.deathRate = value;
     },
     updateMoveSpeed(state, value) {
-      state.moveSpeed = value
+      state.moveSpeed = value;
     },
     updateMinDaysSick(state, value) {
-      state.minDaysSick = value
+      state.minDaysSick = value;
     },
     updateRecoveryRate(state, value) {
-      state.recoveryRate = value
+      state.recoveryRate = value;
     },
     updateSpreadChance(state, value) {
-      state.spreadChance = value
+      state.spreadChance = value;
     },
 
 
   },
-  actions: {
-  },
-  modules: {
-  }
-})
+  actions: {},
+  modules: {},
+});

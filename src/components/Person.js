@@ -1,7 +1,8 @@
 import Point from './Point';
+import Jobs from './Jobs';
 
 export default class Person {
-  constructor(startPoint, moveVector, radius = 10) {
+  constructor(startPoint, moveVector, radius = 10, job = undefined) {
     this.pos = startPoint;
     this.moveVector = moveVector;
     this.radius = radius;
@@ -10,6 +11,9 @@ export default class Person {
     this.alive = true;
     this.ticksSick = 0;
     this.daysSick = 0;
+
+    this.job = job || Jobs.NonRemote;
+    this.canIgnoreLockDown = Math.random() < 0.05;
   }
 
   setPos(newPoint) {
@@ -32,13 +36,27 @@ export default class Person {
     return {...this.pos.toObj(), r: this.radius};
   }
 
-  updatePos(maxX, maxY, configs = {}){
-    this.pos = this.pos.add(this.moveVector.scale(configs.moveSpeed || 1));
-    if ((this.pos.x - this.radius < 0) || (this.pos.x + this.radius > maxX)){
+  updatePos(maxX, maxY, configs = {}) {
+    const baseMoveSpeed = configs.moveSpeed || 1;
+    const cdcSpeechFactor = configs.cdcSpeechFactor || 1;
+    const socialDistancingFactor = configs.socialDistancingFactor || 1;
+    const stayAtHomeFactor = configs.stayAtHomeFactor || 1;
+    const lockDownFactor = configs.lockDownFactor || 1;
+
+    let moveSpeed = baseMoveSpeed * cdcSpeechFactor * socialDistancingFactor;
+    if (stayAtHomeFactor < 1 && this.job.canRemote) {
+      moveSpeed *= stayAtHomeFactor;
+    }
+    if (lockDownFactor < 1 && !this.canIgnoreLockDown) {
+      moveSpeed *= lockDownFactor;
+    }
+
+    this.pos = this.pos.add(this.moveVector.scale(moveSpeed));
+    if ((this.pos.x - this.radius < 0) || (this.pos.x + this.radius > maxX)) {
       this.moveVector.x *= -1;
     }
 
-    if ((this.pos.y - this.radius < 0) || (this.pos.y + this.radius > maxY)){
+    if ((this.pos.y - this.radius < 0) || (this.pos.y + this.radius > maxY)) {
       this.moveVector.y *= -1;
     }
   }
@@ -75,7 +93,7 @@ export default class Person {
     this.daysSick = Math.floor(this.ticksSick / ticksPerDay);
   }
 
-  checkRecoverOrDeath2(configs){
+  checkRecoverOrDeath2(configs) {
     const ticksPerDay = configs.ticksPerDay || 100;
     const recoveryRate = configs.recoveryRate || 0.2;
     const deathRate = configs.deathRate || 0.05;
@@ -83,14 +101,14 @@ export default class Person {
 
     this.updateSickTime(ticksPerDay);
 
-    if (this.ticksSick % ticksPerDay === 0){
-      if (this.daysSick >= minDaysSick){
+    if (this.ticksSick % ticksPerDay === 0) {
+      if (this.daysSick >= minDaysSick) {
         const rand = Math.random();
-        if (rand < recoveryRate){
+        if (rand < recoveryRate) {
           // They recover
           this.immune = true;
           this.healthy = true;
-        } else if (rand < recoveryRate + deathRate){
+        } else if (rand < recoveryRate + deathRate) {
           // adding is necessary unless we want to recalculate a random number
           // they die
           this.alive = false;
