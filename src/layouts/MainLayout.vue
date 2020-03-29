@@ -6,29 +6,96 @@
         <v-flex xs3>
           <div class="pb-2">
             <v-card dark class="pa-4">
+              <div class="text-center">
+                {{counts.region}}
+              </div>
               <div class="font-weight-bold display-1 text-center">
-                Day {{dayNum}}
+                 Day {{daysPassed}}
               </div>
             </v-card>
           </div>
 
           <div class="pb-2">
-            <v-card dark width="100%" class="pa-2">
+            <v-card v-if="counts.counts" dark width="100%" class="pa-2">
               <v-layout wrap>
-                <v-flex xs6 text-center v-for="(total, i) in totals" :key="i">
+                <v-flex text-center xs6>
+                  <v-card outlined>
+                  <v-flex>
+                  <div class="title">
+                  Population
+                  </div>
+                  <div :class="`display-1 font-weight-bold --text`">
+                    {{counts.counts.totalAlive}}
+                  </div>
+                  </v-flex>
+                  </v-card>
+                </v-flex>
+                <v-flex text-center xs6>
                   <v-card outlined>
                     <v-flex>
                       <div class="title">
-                        {{total.name}}
+                        Recovered
                       </div>
-                      <div :class="`display-1 font-weight-bold ${total.color}--text`">
-                        {{total.number}}
+                      <div :class="`display-1 font-weight-bold green--text`">
+                        {{counts.counts.Immune}}
                       </div>
                     </v-flex>
                   </v-card>
                 </v-flex>
+                <v-flex text-center xs6>
+                  <v-card outlined>
+                    <v-flex>
+                      <div class="title">
+                        Infected
+                      </div>
+                      <div :class="`display-1 font-weight-bold orange--text`">
+                        {{counts.counts.Sick}}
+                      </div>
+                    </v-flex>
+                  </v-card>
+                </v-flex>
+                <v-flex text-center xs6>
+                  <v-card outlined>
+                    <v-flex>
+                      <div class="title">
+                        Dead
+                      </div>
+                      <div :class="`display-1 font-weight-bold red--text`">
+                        {{counts.counts.Dead}}
+                      </div>
+                    </v-flex>
+                  </v-card>
+                </v-flex>
+                <!--<v-flex xs6 text-center v-for="(total, i) in totals" :key="i">-->
+                  <!--<v-card outlined>-->
+                    <!--<v-flex>-->
+                      <!--<div class="title">-->
+                        <!--{{total.name}}-->
+                      <!--</div>-->
+                      <!--<div :class="`display-1 font-weight-bold ${total.color}&#45;&#45;text`">-->
+                        <!--{{total.number}}-->
+                      <!--</div>-->
+                    <!--</v-flex>-->
+                  <!--</v-card>-->
+                <!--</v-flex>-->
               </v-layout>
             </v-card>
+            <!--<v-card dark width="100%" class="pa-2">-->
+              <!--<v-layout wrap>-->
+                <!--<v-flex xs6 text-center v-for="(total, i) in totals" :key="i">-->
+                  <!--<v-card outlined>-->
+                    <!--<v-flex>-->
+                      <!--<div class="title">-->
+                        <!--{{total.name}}-->
+                      <!--</div>-->
+                      <!--<div :class="`display-1 font-weight-bold ${total.color}&#45;&#45;text`">-->
+                        <!--{{total.number}}-->
+                      <!--</div>-->
+                    <!--</v-flex>-->
+                  <!--</v-card>-->
+                <!--</v-flex>-->
+              <!--</v-layout>-->
+            <!--</v-card>-->
           </div>
           <div>
             <v-card dark width="100%">
@@ -194,6 +261,7 @@
   // @ is an alias to /src
   // import CGameCanvas from '@/components/CGameCanvas.vue'
   import Chart from 'chart.js';
+  import {mapGetters, mapMutations} from 'vuex'
 
   const gradients = [
     ['#222'],
@@ -274,46 +342,62 @@
         cdcPowers: [
           {
             title: "Wash your hands #tweet",
+            tag: 'washHands',
+            factor: 0.95,
             icon: "XX",
             description: "This will limit the spread of germs by 1/2 because people will be washing them away"
           },
           {
-            title: "Speech by Dr.Fauchi",
+            title: "Speech by CDC Official",
+            tag: 'cdcSpeech',
+            factor: 0.85,
             icon: "XX",
             description: "This will limit the spread of germs by 1/2 because people will be washing them away"
           },
           {
-            title: "News Report on vaccine",
+            title: "New Vaccine introduced",
+            tag: 'vaccine',
+            factor: 0.15,
             icon: "XX",
             description: "This will limit the spread of germs by 1/2 because people will be washing them away"
           },
           {
-            title: "Wash your hands #tweet",
+            title: "Build new hospital",
+            tag: 'newHospital',
+            factor: 1.50,
             icon: "XX",
-            description: "This will limit the spread of germs by 1/2 because people will be washing them away"
+            description: "This increases peoples recovery rate by 50%"
           },
 
         ],
         govtPowers: [
           {
+            title: "Social distancing request",
+            tag: 'socialDistancing',
+            factor: 0.50,
+            icon: "XX",
+            description: "This will reduce spread rate by 50%"
+          },
+          {
             title: "Stay at home order",
+            tag: 'stayHome',
+            factor: 0.05,
             icon: "XX",
-            description: "This will limit the spread of germs by 1/2 because people will be washing them away"
+            description: "This will slow population of non essential employees to 5%"
           },
           {
-            title: "Social Distancing",
+            title: "Lock down",
+            tag: 'lockDown',
+            factor: 0.05,
             icon: "XX",
-            description: "This will limit the spread of germs by 1/2 because people will be washing them away"
+            description: "This will decrease movement to 0 for all except 5% of population for 5 days"
           },
           {
-            title: "Lockdown Country",
+            title: "Close Borders",
+            tag: 'washHands',
+            factor: 0.05,
             icon: "XX",
-            description: "This will limit the spread of germs by 1/2 because people will be washing them away"
-          },
-          {
-            title: "Nuclear Bomb",
-            icon: "XX",
-            description: "This will limit the spread of germs by 1/2 because people will be washing them away"
+            description: "Coming soon - This will limit traffic from each region to 5% for 5 days"
           },
         ],
 
@@ -370,15 +454,68 @@
 
       }
     },
+    computed: {
+      ...mapGetters({
+        counts: 'counts',
+        daysPassed: 'days'
+      })
+    },
     mounted() {
       this.createChart('case-chart', this.chartData);
     },
     methods: {
+      ...mapMutations([
+              'updateMoveSpeed',
+              'updateWashHandsFactor',
+              "updateCdcSpeechFactor",
+              "updateLockDownFactor",
+              "updateNewHospitalFactor",
+              "updateSocialDistancingFactor",
+              "updateStayAtHomeFactor",
+              "updateVaccinePercentage",
+              "updateVaccineUsed"
+      ]),
       runGovtPower(power) {
         console.log(power)
+        switch(power.tag) {
+          case 'socialDistancing':
+            this.updateSocialDistancingFactor(power.factor)
+            break;
+          case 'stayHome':
+            this.updateStayAtHomeFactor(power.factor)
+            break;
+          case 'lockdown':
+            this.updateLockDownFactor(power.factor)
+            break;
+          default:
+            break;
+          // case 'closeBorders':
+          //   this.update(power.factor)
+          //   break;
+        }
       },
       runCdcPower(power) {
         console.log(power)
+        switch(power.tag) {
+          case 'washHands':
+            console.log(power.factor)
+            this.updateWashHandsFactor(power.factor)
+            break;
+          case 'cdcSpeech':
+            this.updateCdcSpeechFactor(power.factor)
+            break;
+          case 'vaccine':
+            this.updateVaccineUsed(-1)
+            this.updateVaccinePercentage(power.factor)
+            break;
+          case 'newHospital':
+            this.updateNewHospitalFactor(power.factor)
+            break;
+          default:
+            break;
+        }
+
+
       },
       createChart(chartId, chartData) {
         const ctx = document.getElementById(chartId);

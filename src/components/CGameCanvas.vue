@@ -38,7 +38,7 @@ import Region from './Region';
 const testRegion = new Region('Test Region', new Quad(0, 0, 500, 400));
 testRegion.initialize(500);
 const testViewPort = new Quad(0, 0, 500, 400);
-
+import {mapMutations, mapGetters} from 'vuex'
 export default {
   name: 'GameCanvas',
   data: () => ({
@@ -47,6 +47,7 @@ export default {
     counts: {},
     ticksPassed: 0,
     daysPassed: 0,
+    totalCounts: {}
   }),
   created() {
     var vm = this;
@@ -63,13 +64,16 @@ export default {
     return this.timer;
   },
   computed: {
+    ...mapGetters({
+
+               }),
     configs() {
       return {
         ticksPerDay: 100,
         moveSpeed: 2,
         minDaysSick: 14,
         recoveryRate: 0.2, // rates need to be between 0-1 (inclusive)
-        deathRate: 0.05, // rates need to be between 0-1 (inclusive)
+        deathRate: 0.1, // rates need to be between 0-1 (inclusive)
         spreadChance: 0.1, // chances need to be between 0-1 (inclusive)
       };
     },
@@ -77,9 +81,11 @@ export default {
       return Object.values(this.counts).reduce((total, {Sick}) => total += Sick, 0);
     },
     totalAlive() {
+
       return Object.values(this.counts).reduce((total, {totalAlive}) => total += totalAlive, 0);
     },
     totalDead() {
+
       return Object.values(this.counts).reduce((total, {Dead}) => total += Dead, 0);
     },
     totalExisting() {
@@ -87,6 +93,10 @@ export default {
     },
   },
   methods: {
+    ...mapMutations([
+       'updateCounts',
+            'updateDays'
+    ]),
     tick() {
       // pretick all regions
       testRegion.preTick(this.configs);
@@ -95,13 +105,21 @@ export default {
       testRegion.tick(this.configs);
 
       // update counts
-      this.$set(this.counts, testRegion.name, testRegion.getCounts());
+      this.$set(this.counts, 'counts', testRegion.getCounts());
+
+      this.totalCounts = {
+        counts: testRegion.getCounts(),
+        region: testRegion.name,
+      }
+      this.updateCounts(this.totalCounts)
+
 
       this.ticksPassed += 1;
       if (this.ticksPassed % this.configs.ticksPerDay === 0) {
         this.ticksPassed = 0;
         this.daysPassed += 1;
       }
+      this.updateDays(this.daysPassed)
     },
     draw() {
       this.tick();
