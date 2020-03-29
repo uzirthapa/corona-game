@@ -44,7 +44,7 @@ import Region from './Region';
 const testRegion = new Region('Test Region', new Quad(0, 0, 500, 400));
 testRegion.initialize(500);
 const testViewPort = new Quad(0, 0, 500, 400);
-
+import {mapMutations, mapGetters} from 'vuex'
 export default {
   name: 'GameCanvas',
   data: () => ({
@@ -58,6 +58,7 @@ export default {
     testViewPort: new Quad(0, 0, 500, 400),
     initialHealthy: 99,
     initialSick: 1,
+    totalCounts: {}
   }),
   created() {
     this.canvas = this.$refs.canvas;
@@ -89,6 +90,9 @@ export default {
     // return this.timer;
   },
   computed: {
+    ...mapGetters({
+
+               }),
     configs() {
       return {
         ticksPerDay: 100,
@@ -123,6 +127,10 @@ export default {
     },
   },
   methods: {
+    ...mapMutations([
+       'updateCounts',
+            'updateDays'
+    ]),
     tick() {
       // pretick all regions
       testRegion.preTick(this.configs);
@@ -131,13 +139,21 @@ export default {
       testRegion.tick(this.configs);
 
       // update counts
-      this.$set(this.counts, testRegion.name, testRegion.getCounts());
+      this.$set(this.counts, 'counts', testRegion.getCounts());
+
+      this.totalCounts = {
+        counts: testRegion.getCounts(),
+        region: testRegion.name,
+      }
+      this.updateCounts(this.totalCounts)
+
 
       this.ticksPassed += 1;
       if (this.ticksPassed % this.configs.ticksPerDay === 0) {
         this.ticksPassed = 0;
         this.daysPassed += 1;
       }
+      this.updateDays(this.daysPassed)
     },
     draw() {
       this.tick();
