@@ -1,38 +1,6 @@
 <template>
   <div class="home">
     <!--<img alt="Vue logo" src="../assets/logo.png">-->
-    <v-app-bar
-            app
-            dark
-    >
-      <div class="d-flex align-center">
-        <div class="accent--text display-2">
-          CoroNation
-        </div>
-      </div>
-
-      <v-spacer></v-spacer>
-      <v-menu bottom left>
-        <template v-slot:activator="{ on }">
-          <v-btn
-                  dark
-                  icon
-                  v-on="on"
-          >
-            <v-icon>mdi-dots-vertical</v-icon>
-          </v-btn>
-        </template>
-
-        <v-list>
-          <v-list-item>
-            <v-list-item-title>Restart</v-list-item-title>
-          </v-list-item>
-          <v-list-item to="home">
-            <v-list-item-title>End Game</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </v-app-bar>
     <v-container fluid grid-list-md>
       <v-layout>
         <v-flex xs3>
