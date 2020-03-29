@@ -2,11 +2,15 @@
   <v-container>
     <v-row class="text-center">
       <v-col>
-        <div>
-          <canvas id="canvas" width="500" height="400">
-            Sorry, browser does not support canvas.
-          </canvas>
-        </div>
+        <canvas
+          id="canvas"
+          width="500"
+          height="400"
+        >
+          Sorry, browser does not support canvas.
+        </canvas>
+      </v-col>
+      <v-col>
         <div>
           {{counts}}
         </div>
@@ -31,9 +35,9 @@
 import Quad from './Quad';
 import Region from './Region';
 
-const testRegion = new Region('Test Region', new Quad(0, 0, 800, 600));
-testRegion.initialize(1000);
-const testViewPort = new Quad(0, 0, 800, 600);
+const testRegion = new Region('Test Region', new Quad(0, 0, 500, 400));
+testRegion.initialize(500);
+const testViewPort = new Quad(0, 0, 500, 400);
 
 export default {
   name: 'GameCanvas',
