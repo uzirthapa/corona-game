@@ -216,22 +216,19 @@
                 <div>Number of Infections by day</div>
               </v-card-title>
               <canvas id="case-chart"></canvas>
-                  <!--<v-sparkline-->
-                          <!--:labels="labels"-->
-                      <!--:value="value"-->
-                      <!--:gradient="gradient"-->
-                      <!--:smooth="radius || false"-->
-                      <!--:padding="padding"-->
-                      <!--:line-width="width"-->
-                          <!--color="white"-->
-                      <!--:stroke-linecap="lineCap"-->
-                      <!--:gradient-direction="gradientDirection"-->
-                      <!--:fill="fill"-->
-                      <!--:type="type"-->
-                      <!--:auto-line-width="autoLineWidth"-->
-                      <!--auto-draw-->
-                  <!--&gt;-->
-                  <!--</v-sparkline>-->
+              <!--    <v-sparkline
+                      :value="value"
+                      :gradient="gradient"
+                      :smooth="radius || false"
+                      :padding="padding"
+                      :line-width="width"
+                      :stroke-linecap="lineCap"
+                      :gradient-direction="gradientDirection"
+                      :fill="fill"
+                      :type="type"
+                      :auto-line-width="autoLineWidth"
+                      auto-draw
+                  ></v-sparkline>-->
             </v-card>
           </div>
         </v-flex>
@@ -525,87 +522,59 @@ export default {
         },
       ],
 
+      pastCount:[],
+      pastRecoveredCount:[],
+      pastDays:[],
       // chart options
       chartData: {
         type: 'line',
         data: {
-          labels: ['Day 0'],
+          labels: this.pastDays,
           datasets: [
             { // one line graph
               label: 'Number of Cases',
-              data: [0],
-              backgroundColor: [
-                'rgba(255,152,0,0.5)',
-              ],
-              borderColor: [
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-              ],
+              data: this.pastCount,
+              backgroundColor: 'rgba(255, 165,0,.8)',
+              borderColor: '#FFA500',
               borderWidth: 3,
             },
-            { // one line graph
-              label: 'Number of Deaths',
-              data: [0],
+            { // another line graph
+              label: 'Number of Recovered',
+              data: this.pastRecoveredCount,
               backgroundColor: [
-                'rgba(255, 0,0,.5)',
+                'rgba(71, 183,132,.5)', // Green
               ],
               borderColor: [
-                '#fff',
-                '#fff',
-                '#fff',
-                '#fff',
-                '#fff',
-                '#fff',
-                '#fff',
-                '#fff',
+                '#47b784',
               ],
-              borderWidth: 3,
+              borderWidth: 3
             },
-            { // one line graph
-              label: 'Number of Healthy',
-              data: [0],
+            { // another line graph
+              label: 'Number of Dead',
+              data: this.pastRecoveredCount,
               backgroundColor: [
-                'rgba(118, 255,3,.5)',
+                'rgba(255, 0,0,.5)', //Red
               ],
-              borderColor: [
-                '#4A148C',
-                '#4A148C',
-                '#4A148C',
-                '#4A148C',
-                '#4A148C',
-                '#4A148C',
-                '#4A148C',
-                '#4A148C',
-              ],
-              borderWidth: 3,
+              borderColor: '#36495d',
+              borderWidth: 3
             },
-            /*   { // another line graph
-                 label: 'Planet Mass (x1,000 km)',
-                 data: [4.8, 12.1, 12.7, 6.7, 139.8, 116.4, 50.7, 49.2],
-                 backgroundColor: [
-                   'rgba(71, 183,132,.5)', // Green
-                 ],
-                 borderColor: [
-                   '#47b784',
-                 ],
-                 borderWidth: 3
-               }*/
+
           ],
         },
         options: {
+          animation: false,
           responsive: true,
           lineTension: 1,
           scales: {
             yAxes: [{
               ticks: {
                 beginAtZero: true,
-                padding: 25,
+                padding: 10,
+                scaleOverride : true,
+                scaleSteps : 5,
+                scaleStepWidth : 50,
+                scaleStartValue : 0,
+                suggestedMax:10
               },
             }],
           },
@@ -614,26 +583,6 @@ export default {
 
     };
   },
-  watch: {
-    'daysPassed': {
-      handler(newVal) {
-        console.log(newVal)
-        this.labels.push(newVal)
-        // this.recordCurrentCounts()
-        console.log(this.globalTotals)
-        this.value.push(this.globalTotals.totalSick)
-
-        // console.log(this.chartData.data)
-
-        this.chartData.data.labels.push(`Day ${newVal}`)
-        this.chartData.data.datasets[0].data.push(this.globalTotals.totalSick)
-        this.chartData.data.datasets[1].data.push(this.globalTotals.totalDead)
-        this.chartData.data.datasets[2].data.push(this.globalTotals.totalHealthy)
-        this.createChart('case-chart', this.chartData);
-        // console.log(this.chartData)
-      }
-    }
-  },
   computed: {
     ...mapGetters({
       counts: 'counts',
@@ -641,9 +590,33 @@ export default {
       globalTotals: 'globalTotals',
     }),
   },
+  watch:{
+   /* "globalTotals.totalSick": function (val) {
+      this.pastCount.push(val);
+      this.$set(this.chartData.data.datasets[0], "data", this.pastCount);
+      this.createChart('case-chart', this.chartData);
+    },*/
+  /*  "globalTotals.totalImmune": function (val) {
+      this.pastRecoveredCount.push(val);
+      this.$set(this.chartData.data.datasets[1], "data", this.pastRecoveredCount);
+      this.createChart('case-chart', this.chartData);
+    },*/
+    daysPassed:function (val) {
+      this.pastCount.push(this.globalTotals.totalSick);
+      this.$set(this.chartData.data.datasets[0], "data", this.pastCount);
+
+      this.pastRecoveredCount.push(this.globalTotals.totalImmune);
+      this.$set(this.chartData.data.datasets[1], "data", this.pastRecoveredCount);
+
+      this.pastDays.push(`Day ${val}`);
+      this.$set(this.chartData.data, "labels", this.pastDays);
+      this.createChart('case-chart', this.chartData);
+    },
+  },
   mounted() {
-    this.resetChart()
-    this.resetPowers()
+    this.createChart('case-chart', this.chartData);
+    this.resetPowers();
+    this.resetChart();
   },
   methods: {
     ...mapMutations([
@@ -658,14 +631,16 @@ export default {
       'updateVaccineUsed',
     ]),
     resetChart() {
-      this.chartData.data.labels = []
-      this.chartData.data.datasets[0].data = []
-      this.chartData.data.datasets[1].data = []
-      this.chartData.data.datasets[2].data = []
+      // this.chartData.data.labels = []
+      // this.chartData.data.datasets[0].data = []
+      // this.chartData.data.datasets[1].data = []
+      // this.chartData.data.datasets[2].data = []
+      this.pastCount = [];
+      this.pastDays = [];
+      this.pastRecoveredCount = [];
       this.createChart('case-chart', this.chartData);
     },
     resetPowers(){
-
       this.govtPowers.map(power => {
         if(power.tag !== "closeBorder") {
           power.used = false
@@ -725,9 +700,9 @@ export default {
     createChart(chartId, chartData) {
       const ctx = document.getElementById(chartId);
       const myChart = new Chart(ctx, {
-        type: this.chartData.type,
-        data: this.chartData.data,
-        options: this.chartData.options,
+        type: chartData.type,
+        data: chartData.data,
+        options: chartData.options,
       });
     },
   },
