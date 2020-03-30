@@ -458,7 +458,7 @@ export default {
           factor: 0.95,
           icon: 'XX',
           used: false,
-          description: 'This will limit the spread of germs by 1/2 because people will be washing them away',
+          description: 'This will limit the spread of the virus by 50%',
         },
         {
           title: 'Speech by CDC Official',
@@ -466,7 +466,7 @@ export default {
           factor: 0.85,
           icon: 'XX',
           used: false,
-          description: 'This will limit the spread of germs by 1/2 because people will be washing them away',
+          description: "This reduces people's movement by 15%",
         },
         {
           title: 'New Vaccine introduced',
@@ -474,7 +474,7 @@ export default {
           factor: 0.15,
           icon: 'XX',
           used: false,
-          description: 'This will limit the spread of germs by 1/2 because people will be washing them away',
+          description: 'This makes 15% of the population immune to the virus',
         },
         {
           title: 'Build new hospital',
@@ -482,7 +482,7 @@ export default {
           factor: 1.50,
           icon: 'XX',
           used: false,
-          description: 'This increases peoples recovery rate by 50%',
+          description: 'This increases peoples chances to recover by 50%',
         },
 
       ],
@@ -493,7 +493,7 @@ export default {
           factor: 0.50,
           icon: 'XX',
           used: false,
-          description: 'This will reduce spread rate by 50%',
+          description: 'This will reduce infection rate of the virus by 50%',
         },
         {
           title: 'Stay at home order',
@@ -501,7 +501,7 @@ export default {
           factor: 0.05,
           icon: 'XX',
           used: false,
-          description: 'This will slow population of non essential employees to 5%',
+          description: 'This will slow the population of non essential employees to 5%',
         },
         {
           title: 'Lock down',
@@ -509,14 +509,14 @@ export default {
           factor: 0,
           icon: 'XX',
           used: false,
-          description: 'This will decrease movement to 0 for all except 5% of population for 5 days',
+          description: 'This will decrease movement to 0 for all except 5% of the population for 5 days',
         },
         {
           title: 'Close Borders',
           tag: 'washHands',
           factor: 0.05,
           icon: 'XX',
-          used: false,
+          used: true,
           description: 'Coming soon - This will limit traffic from each region to 5% for 5 days',
         },
       ],
