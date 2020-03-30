@@ -598,7 +598,8 @@ export default {
   },
   mounted() {
     this.createChart('case-chart', this.chartData);
-    this.resetPowers()
+    this.resetPowers();
+    this.resetChart();
   },
   methods: {
     ...mapMutations([
@@ -613,14 +614,15 @@ export default {
       'updateVaccineUsed',
     ]),
     resetChart() {
-      this.chartData.data.labels = []
-      this.chartData.data.datasets[0].data = []
-      this.chartData.data.datasets[1].data = []
-      this.chartData.data.datasets[2].data = []
+      // this.chartData.data.labels = []
+      // this.chartData.data.datasets[0].data = []
+      // this.chartData.data.datasets[1].data = []
+      // this.chartData.data.datasets[2].data = []
+      this.pastCount = [];
+      this.pastDays = [];
       this.createChart('case-chart', this.chartData);
     },
     resetPowers(){
-
       this.govtPowers.map(power => {
         if(power.tag !== "closeBorder") {
           power.used = false
