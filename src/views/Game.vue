@@ -100,7 +100,10 @@
     },
     methods: {
         reset(){
-            this.$refs.mainLayout.resetPowers()
+            if(this.$refs.mainLayout) {
+                this.$refs.mainLayout.resetPowers()
+            }
+
         },
 
       runGovtPower(power){

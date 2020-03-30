@@ -213,22 +213,25 @@
               class="pa-2"
             >
               <v-card-title>
-                <div>Number of Cases by day</div>
+                <div>Number of Infections by day</div>
               </v-card-title>
               <canvas id="case-chart"></canvas>
-              <!--    <v-sparkline
-                      :value="value"
-                      :gradient="gradient"
-                      :smooth="radius || false"
-                      :padding="padding"
-                      :line-width="width"
-                      :stroke-linecap="lineCap"
-                      :gradient-direction="gradientDirection"
-                      :fill="fill"
-                      :type="type"
-                      :auto-line-width="autoLineWidth"
-                      auto-draw
-                  ></v-sparkline>-->
+                  <!--<v-sparkline-->
+                          <!--:labels="labels"-->
+                      <!--:value="value"-->
+                      <!--:gradient="gradient"-->
+                      <!--:smooth="radius || false"-->
+                      <!--:padding="padding"-->
+                      <!--:line-width="width"-->
+                          <!--color="white"-->
+                      <!--:stroke-linecap="lineCap"-->
+                      <!--:gradient-direction="gradientDirection"-->
+                      <!--:fill="fill"-->
+                      <!--:type="type"-->
+                      <!--:auto-line-width="autoLineWidth"-->
+                      <!--auto-draw-->
+                  <!--&gt;-->
+                  <!--</v-sparkline>-->
             </v-card>
           </div>
         </v-flex>
@@ -390,12 +393,13 @@ export default {
   },
   data() {
     return {
-      width: 2,
-      radius: 10,
-      padding: 8,
+      width: 1,
+      radius: 2,
+      padding: 2,
       lineCap: 'round',
+      labels: ['Day 0'],
       gradient: gradients[5],
-      value: [0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8],
+      value: [0],
       gradientDirection: 'top',
       gradients,
       fill: false,
@@ -525,13 +529,13 @@ export default {
       chartData: {
         type: 'line',
         data: {
-          labels: ['0/01/01', '0/01/02', '0/01/03', '0/01/04', '0/01/05', '0/01/06', '0/01/07', '0/01/08'],
+          labels: ['Day 0'],
           datasets: [
             { // one line graph
               label: 'Number of Cases',
-              data: [0, 0, 1, 2, 67, 62, 60, 40],
+              data: [0],
               backgroundColor: [
-                'rgba(255, 0,0,.5)',
+                'rgba(255,152,0,0.5)',
               ],
               borderColor: [
                 '#36495d',
@@ -542,6 +546,42 @@ export default {
                 '#36495d',
                 '#36495d',
                 '#36495d',
+              ],
+              borderWidth: 3,
+            },
+            { // one line graph
+              label: 'Number of Deaths',
+              data: [0],
+              backgroundColor: [
+                'rgba(255, 0,0,.5)',
+              ],
+              borderColor: [
+                '#fff',
+                '#fff',
+                '#fff',
+                '#fff',
+                '#fff',
+                '#fff',
+                '#fff',
+                '#fff',
+              ],
+              borderWidth: 3,
+            },
+            { // one line graph
+              label: 'Number of Healthy',
+              data: [0],
+              backgroundColor: [
+                'rgba(118, 255,3,.5)',
+              ],
+              borderColor: [
+                '#4A148C',
+                '#4A148C',
+                '#4A148C',
+                '#4A148C',
+                '#4A148C',
+                '#4A148C',
+                '#4A148C',
+                '#4A148C',
               ],
               borderWidth: 3,
             },
@@ -574,6 +614,26 @@ export default {
 
     };
   },
+  watch: {
+    'daysPassed': {
+      handler(newVal) {
+        console.log(newVal)
+        this.labels.push(newVal)
+        // this.recordCurrentCounts()
+        console.log(this.globalTotals)
+        this.value.push(this.globalTotals.totalSick)
+
+        // console.log(this.chartData.data)
+
+        this.chartData.data.labels.push(`Day ${newVal}`)
+        this.chartData.data.datasets[0].data.push(this.globalTotals.totalSick)
+        this.chartData.data.datasets[1].data.push(this.globalTotals.totalDead)
+        this.chartData.data.datasets[2].data.push(this.globalTotals.totalHealthy)
+        this.createChart('case-chart', this.chartData);
+        // console.log(this.chartData)
+      }
+    }
+  },
   computed: {
     ...mapGetters({
       counts: 'counts',
@@ -582,7 +642,7 @@ export default {
     }),
   },
   mounted() {
-    this.createChart('case-chart', this.chartData);
+
     this.resetPowers()
   },
   methods: {
@@ -657,9 +717,9 @@ export default {
     createChart(chartId, chartData) {
       const ctx = document.getElementById(chartId);
       const myChart = new Chart(ctx, {
-        type: chartData.type,
-        data: chartData.data,
-        options: chartData.options,
+        type: this.chartData.type,
+        data: this.chartData.data,
+        options: this.chartData.options,
       });
     },
   },
