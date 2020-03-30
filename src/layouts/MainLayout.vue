@@ -563,7 +563,8 @@ export default {
                 scaleOverride : true,
                 scaleSteps : 5,
                 scaleStepWidth : 50,
-                scaleStartValue : 0
+                scaleStartValue : 0,
+                suggestedMax:10
               },
             }],
           },
