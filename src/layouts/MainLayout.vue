@@ -629,6 +629,7 @@ export default {
       'updateStayAtHomeFactor',
       'updateVaccinePercentage',
       'updateVaccineUsed',
+            'updateDays'
     ]),
     resetChart() {
       // this.chartData.data.labels = []
@@ -641,6 +642,18 @@ export default {
       this.createChart('case-chart', this.chartData);
     },
     resetPowers(){
+      this.updateWashHandsFactor(1)
+      this.updateCdcSpeechFactor(1)
+      this.updateLockDownFactor(1)
+      this.updateNewHospitalFactor(1)
+      this.updateSocialDistancingFactor(1)
+      this.updateStayAtHomeFactor(1)
+      this.updateVaccinePercentage(0)
+      this.updateVaccineUsed(0)
+      this.updateDays(0)
+
+
+
       this.govtPowers.map(power => {
         if(power.tag !== "closeBorder") {
           power.used = false
