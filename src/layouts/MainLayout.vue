@@ -513,7 +513,7 @@ export default {
         },
         {
           title: 'Close Borders',
-          tag: 'washHands',
+          tag: 'closeBorder',
           factor: 0.05,
           icon: 'XX',
           used: true,
@@ -583,6 +583,7 @@ export default {
   },
   mounted() {
     this.createChart('case-chart', this.chartData);
+    this.resetPowers()
   },
   methods: {
     ...mapMutations([
@@ -596,6 +597,17 @@ export default {
       'updateVaccinePercentage',
       'updateVaccineUsed',
     ]),
+    resetPowers(){
+      this.govtPowers.map(power => {
+        if(power.tag !== "closeBorder") {
+          power.used = false
+        }
+      })
+      this.cdcPowers.map(power => {
+
+        power.used = false
+      })
+    },
     runGovtPower(power) {
       power.used = true;
       console.log(power);
