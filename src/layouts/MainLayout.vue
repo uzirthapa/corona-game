@@ -534,8 +534,8 @@ export default {
             { // one line graph
               label: 'Number of Cases',
               data: this.pastCount,
-              backgroundColor: 'rgba(255, 0,0,.5)',
-              borderColor: '#36495d',
+              backgroundColor: 'rgba(255, 165,0,.8)',
+              borderColor: '#FFA500',
               borderWidth: 3,
             },
             { // another line graph
@@ -548,7 +548,17 @@ export default {
                 '#47b784',
               ],
               borderWidth: 3
-            }
+            },
+            { // another line graph
+              label: 'Number of Dead',
+              data: this.pastRecoveredCount,
+              backgroundColor: [
+                'rgba(255, 0,0,.5)', //Red
+              ],
+              borderColor: '#36495d',
+              borderWidth: 3
+            },
+
           ],
         },
         options: {
