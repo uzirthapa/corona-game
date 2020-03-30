@@ -642,7 +642,7 @@ export default {
     }),
   },
   mounted() {
-
+    this.resetChart()
     this.resetPowers()
   },
   methods: {
@@ -657,7 +657,15 @@ export default {
       'updateVaccinePercentage',
       'updateVaccineUsed',
     ]),
+    resetChart() {
+      this.chartData.data.labels = []
+      this.chartData.data.datasets[0].data = []
+      this.chartData.data.datasets[1].data = []
+      this.chartData.data.datasets[2].data = []
+      this.createChart('case-chart', this.chartData);
+    },
     resetPowers(){
+
       this.govtPowers.map(power => {
         if(power.tag !== "closeBorder") {
           power.used = false
