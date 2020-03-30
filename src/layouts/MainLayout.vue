@@ -213,7 +213,7 @@
               class="pa-2"
             >
               <v-card-title>
-                <div>Number of Cases by day</div>
+                <div>Number of Infections by day</div>
               </v-card-title>
               <canvas id="case-chart"></canvas>
               <!--    <v-sparkline
@@ -390,12 +390,13 @@ export default {
   },
   data() {
     return {
-      width: 2,
-      radius: 10,
-      padding: 8,
+      width: 1,
+      radius: 2,
+      padding: 2,
       lineCap: 'round',
+      labels: ['Day 0'],
       gradient: gradients[5],
-      value: [0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8],
+      value: [0],
       gradientDirection: 'top',
       gradients,
       fill: false,
@@ -611,7 +612,15 @@ export default {
       'updateVaccinePercentage',
       'updateVaccineUsed',
     ]),
+    resetChart() {
+      this.chartData.data.labels = []
+      this.chartData.data.datasets[0].data = []
+      this.chartData.data.datasets[1].data = []
+      this.chartData.data.datasets[2].data = []
+      this.createChart('case-chart', this.chartData);
+    },
     resetPowers(){
+
       this.govtPowers.map(power => {
         if(power.tag !== "closeBorder") {
           power.used = false

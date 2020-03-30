@@ -100,9 +100,11 @@
     },
     methods: {
         reset(){
-            this.$refs.mainLayout.resetPowers()
+            if(this.$refs.mainLayout) {
+                this.$refs.mainLayout.resetPowers()
+                this.$refs.mainLayout.resetChart()
+            }
         },
-
       runGovtPower(power){
         console.log(power)
       },
