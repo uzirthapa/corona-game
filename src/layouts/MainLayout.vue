@@ -538,9 +538,9 @@ export default {
               borderColor: '#36495d',
               borderWidth: 3,
             },
-          /*  { // another line graph
+            { // another line graph
               label: 'Number of Recovered',
-              data: [4.8, 12.1, 12.7, 6.7, 139.8, 116.4, 50.7, 49.2],
+              data: this.pastRecoveredCount,
               backgroundColor: [
                 'rgba(71, 183,132,.5)', // Green
               ],
@@ -548,7 +548,7 @@ export default {
                 '#47b784',
               ],
               borderWidth: 3
-            }*/
+            }
           ],
         },
         options: {
@@ -580,17 +580,23 @@ export default {
     }),
   },
   watch:{
-    "globalTotals.totalSick": function (val) {
+   /* "globalTotals.totalSick": function (val) {
       this.pastCount.push(val);
       this.$set(this.chartData.data.datasets[0], "data", this.pastCount);
       this.createChart('case-chart', this.chartData);
-    },
-   /* "globalTotals.totalImmune": function (val) {
+    },*/
+  /*  "globalTotals.totalImmune": function (val) {
       this.pastRecoveredCount.push(val);
       this.$set(this.chartData.data.datasets[1], "data", this.pastRecoveredCount);
       this.createChart('case-chart', this.chartData);
     },*/
     daysPassed:function (val) {
+      this.pastCount.push(this.globalTotals.totalSick);
+      this.$set(this.chartData.data.datasets[0], "data", this.pastCount);
+
+      this.pastRecoveredCount.push(this.globalTotals.totalImmune);
+      this.$set(this.chartData.data.datasets[1], "data", this.pastRecoveredCount);
+
       this.pastDays.push(`Day ${val}`);
       this.$set(this.chartData.data, "labels", this.pastDays);
       this.createChart('case-chart', this.chartData);
@@ -620,6 +626,7 @@ export default {
       // this.chartData.data.datasets[2].data = []
       this.pastCount = [];
       this.pastDays = [];
+      this.pastRecoveredCount = [];
       this.createChart('case-chart', this.chartData);
     },
     resetPowers(){
