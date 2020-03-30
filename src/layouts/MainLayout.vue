@@ -521,51 +521,48 @@ export default {
         },
       ],
 
+      pastCount:[],
+      pastRecoveredCount:[],
+      pastDays:[],
       // chart options
       chartData: {
         type: 'line',
         data: {
-          labels: ['0/01/01', '0/01/02', '0/01/03', '0/01/04', '0/01/05', '0/01/06', '0/01/07', '0/01/08'],
+          labels: this.pastDays,
           datasets: [
             { // one line graph
               label: 'Number of Cases',
-              data: [0, 0, 1, 2, 67, 62, 60, 40],
-              backgroundColor: [
-                'rgba(255, 0,0,.5)',
-              ],
-              borderColor: [
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-                '#36495d',
-              ],
+              data: this.pastCount,
+              backgroundColor: 'rgba(255, 0,0,.5)',
+              borderColor: '#36495d',
               borderWidth: 3,
             },
-            /*   { // another line graph
-                 label: 'Planet Mass (x1,000 km)',
-                 data: [4.8, 12.1, 12.7, 6.7, 139.8, 116.4, 50.7, 49.2],
-                 backgroundColor: [
-                   'rgba(71, 183,132,.5)', // Green
-                 ],
-                 borderColor: [
-                   '#47b784',
-                 ],
-                 borderWidth: 3
-               }*/
+          /*  { // another line graph
+              label: 'Number of Recovered',
+              data: [4.8, 12.1, 12.7, 6.7, 139.8, 116.4, 50.7, 49.2],
+              backgroundColor: [
+                'rgba(71, 183,132,.5)', // Green
+              ],
+              borderColor: [
+                '#47b784',
+              ],
+              borderWidth: 3
+            }*/
           ],
         },
         options: {
+          animation: false,
           responsive: true,
           lineTension: 1,
           scales: {
             yAxes: [{
               ticks: {
                 beginAtZero: true,
-                padding: 25,
+                padding: 10,
+                scaleOverride : true,
+                scaleSteps : 5,
+                scaleStepWidth : 50,
+                scaleStartValue : 0
               },
             }],
           },
@@ -580,6 +577,23 @@ export default {
       daysPassed: 'days',
       globalTotals: 'globalTotals',
     }),
+  },
+  watch:{
+    "globalTotals.totalSick": function (val) {
+      this.pastCount.push(val);
+      this.$set(this.chartData.data.datasets[0], "data", this.pastCount);
+      this.createChart('case-chart', this.chartData);
+    },
+   /* "globalTotals.totalImmune": function (val) {
+      this.pastRecoveredCount.push(val);
+      this.$set(this.chartData.data.datasets[1], "data", this.pastRecoveredCount);
+      this.createChart('case-chart', this.chartData);
+    },*/
+    daysPassed:function (val) {
+      this.pastDays.push(`Day ${val}`);
+      this.$set(this.chartData.data, "labels", this.pastDays);
+      this.createChart('case-chart', this.chartData);
+    },
   },
   mounted() {
     this.createChart('case-chart', this.chartData);
