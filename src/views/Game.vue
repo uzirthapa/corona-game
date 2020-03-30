@@ -1,9 +1,9 @@
 <template>
     <div class="home">
         <!--<img alt="Vue logo" src="../assets/logo.png">-->
-        <main-layout>
+        <main-layout ref="mainLayout">
             <template v-slot:canvas>
-                <c-game-canvas msg="Welcome to Your Vue.js App"/>
+                <c-game-canvas @reset="reset" msg="Welcome to Your Vue.js App"/>
             </template>
         </main-layout>
 
@@ -99,6 +99,10 @@
       }
     },
     methods: {
+        reset(){
+            this.$refs.mainLayout.resetPowers()
+        },
+
       runGovtPower(power){
         console.log(power)
       },

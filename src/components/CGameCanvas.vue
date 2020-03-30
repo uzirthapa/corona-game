@@ -38,7 +38,7 @@
 
         <v-btn
           @click="reset"
-          :disabled="!ended"
+          :disabled="!ended && !timer"
         >
           Reset
         </v-btn>
@@ -138,6 +138,7 @@ export default {
       this.paused = !this.paused;
     },
     reset() {
+      this.$emit('reset')
       this.drawBackground();
       this.paused = false;
       this.ended = false;
