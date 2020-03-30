@@ -524,6 +524,7 @@ export default {
 
       pastCount:[],
       pastRecoveredCount:[],
+      pastDeadCount: [],
       pastDays:[],
       // chart options
       chartData: {
@@ -551,11 +552,11 @@ export default {
             },
             { // another line graph
               label: 'Number of Dead',
-              data: this.pastRecoveredCount,
+              data: this.pastDeadCount,
               backgroundColor: [
                 'rgba(255, 0,0,.5)', //Red
               ],
-              borderColor: '#36495d',
+              borderColor: 'rgba(255, 0,0,1)',
               borderWidth: 3
             },
 
@@ -607,6 +608,9 @@ export default {
 
       this.pastRecoveredCount.push(this.globalTotals.totalImmune);
       this.$set(this.chartData.data.datasets[1], "data", this.pastRecoveredCount);
+
+      this.pastDeadCount.push(this.globalTotals.totalDead);
+      this.$set(this.chartData.data.datasets[2], "data", this.pastDeadCount);
 
       this.pastDays.push(`Day ${val}`);
       this.$set(this.chartData.data, "labels", this.pastDays);
