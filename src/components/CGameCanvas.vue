@@ -139,6 +139,7 @@ export default {
     },
     reset() {
       this.$emit('reset')
+      this.daysPassed = 0
       this.drawBackground();
       this.paused = false;
       this.ended = false;
